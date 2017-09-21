@@ -13,7 +13,6 @@
 <script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/highchart-offline-exporting.js"></script>
 
 <script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/testresult.js"></script>
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/chart-generator.js"></script>
 <script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/test-result-analyzer-template.js"></script>
 <script>
 
@@ -53,33 +52,12 @@ var $j = jQuery.noConflict();
 			<td>Display run time for each test:</td>
 			<td><input type="checkbox" id="show-build-durations" name="show-build-durations" checked="${it.showBuildTime}"/></td>
 		</tr>
-		<tr>
-        	<td>Hide configuration methods (Only for TestNG results}</td>
-        	<td><input type="checkbox" id="hide-config-methods" name="hide-config-methods" checked="${it.hideConfigurationMethods}"/></td>
-        </tr>
-		<tr>
-			<td>Chart type:</td>
-			<td>
-				<input id="linegraph" type="checkbox" checked="${it.showLineGraph}" /> Line
-				<input id="bargraph" type="checkbox" checked="${it.showBarGraph}" /> Bar
-				<input id="piegraph" type="checkbox" checked="${it.showPieGraph}" /> Pie
-			</td>
-		</tr>
-		<tr>
-			<td>Chart Data Type:</td>
-			<td>
-				<select id="chartDataType">
-					<option value="passfail">Passes/Failures</option>
-					<option value="runtime">Test Runtimes</option>
-				</select>
-			</td>
-		</tr>
 	</table>
 	<div>
 		<button id="getbuildreport">Update</button>
 	</div>
 </div>
-<button id="downloadCSV" >Download Test (CSV)</button>
+
 Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Class/Package" onkeyup="searchTests()"/>
 
 <div class="extrabuttons">
@@ -96,33 +74,9 @@ Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Cl
 
    </div>
    <br/>
-
-   <div class="worst-tests-table">
-
-   </div>
 </div>
 <br/>
 <br/>
-
-<div id="charts">
-   <div id="linechart">
-
-   </div>
-   <br/>
-
-   <div id="piechart">
-
-   </div>
-<br/>
-
-   <div id="barchart">
-
-   </div>
-
-</div>
-<div id="builddetail">
-
-</div>
 
 <script>
 	var runtimeLowThreshold = "${it.runTimeLowThreshold}";
@@ -133,34 +87,12 @@ Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Cl
         'FAILED':'FAILED',
         'N/A':'N/A'
     }
-	function generateCharts() {
-		var chartType = {
-			type: jQuery("#chartDataType").val(),
-			line: jQuery('#linegraph').is(':checked'),
-			bar: jQuery('#bargraph').is(':checked'),
-			pie: jQuery('#piegraph').is(':checked')
-		}
-		generateChart(chartType);
-
-		//fixes Jenkins issue where page content is not correctly placed until the window is resized
-		window.dispatchEvent(new Event('resize'));
-	}
 
 	jQuery(document).ready(function () {
 		jQuery("#allnoofbuilds")[0].checked = ${it.showAllBuilds};
 		jQuery("#show-build-durations")[0].checked = ${it.showBuildTime};
-		jQuery("#hide-config-methods")[0].checked = ${it.hideConfigurationMethods};
-		jQuery("#linegraph")[0].checked = ${it.showLineGraph};
-		jQuery("#bargraph")[0].checked = ${it.showBarGraph};
-		jQuery("#piegraph")[0].checked = ${it.showPieGraph};
 		jQuery("#noofbuilds").attr('disabled', ${it.showAllBuilds});
 
-		if ("${it.chartDataType}" === "runtime") {
-			jQuery("#chartDataType").val("runtime");
-			jQuery("#bargraph").attr('disabled', true);
-		} else {
-			jQuery("#chartDataType").val("passfail");
-		}
 		setCustomStatuses();
 		populateTemplate();
 	});
@@ -178,21 +110,6 @@ Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Cl
 	jQuery("#allnoofbuilds").change(function () {
 		jQuery("#noofbuilds").attr('disabled', this.checked);
 	});
-
-	jQuery("#chartDataType").change(function (e) {
-		jQuery("#bargraph").attr('disabled', e.target.value == "runtime");
-	});
-
-	jQuery("#downloadCSV").click(function () {
-	    var noOfBuilds = "-1";
-
-        if (!jQuery("#allnoofbuilds").is(":checked")) {
-            noOfBuilds = jQuery("#noofbuilds").val();
-        }
-        remoteAction.getExportCSV(displayValues, noOfBuilds, function(t) {
-            download("Test Results.csv", t.responseObject());
-        })
-    });
 
 	jQuery("#getbuildreport").click(function () {
 		populateTemplate();
@@ -213,15 +130,6 @@ Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Cl
         customStatuses['N/A'] = "${it.naRepresentation}";
     }
 
-	function download(filename, text) {
-		var element = document.createElement('a');
-		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-		element.setAttribute('download', filename);
-		element.style.display = 'none';
-		document.body.appendChild(element);
-		element.click();	
-		document.body.removeChild(element);
-	}
 </script>
   </l:main-panel>
   </l:layout>

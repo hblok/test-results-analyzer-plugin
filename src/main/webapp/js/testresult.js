@@ -53,8 +53,6 @@ function searchTests(){
 function reset(){
     reevaluateChartData = true;
     $j(".test-history-table").html("");
-    $j(".worst-tests-table").html("");
-    resetCharts();
 }
 
 function populateTemplate(){
@@ -66,12 +64,7 @@ function populateTemplate(){
         $j(".test-history-table").html(
             analyzerTemplate(itemsResponse)
         );
-        var worstTests = getWorstTests(itemsResponse);
-        $j(".worst-tests-table").html(
-            analyzerWorstTestsTemplate(worstTests)
-        );
         addEvents();
-        generateCharts();
         $j("#table-loading").hide();
     },this));
 }
@@ -260,8 +253,6 @@ function checkBoxEvents() {
         var check = this.checked;
         checkChildren(row, check);
         checkParent(row, check);
-
-        generateCharts();
     });
 }
 
@@ -297,14 +288,6 @@ function resetAdvancedOptions(){
     $j("#show-build-durations").prop('checked', false);
 }
 
-function getWorstTests(itemsResponse, range = 10) {
-  worstTests = {}
-  findChildren(itemsResponse);
-  worstTests = $j.map(worstTests, function(v,k) { return {k, v}});
-  worstTests.sort(function (a,b) { return compareInteger(b.v.length, a.v.length)});
-  return worstTests.slice(0, range);
-}
-
 function compareInteger(integer1, integer2) {
   if (parseInt(integer1) > parseInt(integer2)) return 1;
   else if (parseInt(integer1) < parseInt(integer2)) return -1;
@@ -320,7 +303,6 @@ function findChildren(hash, path = '') {
       $j.each(value, function(index1, buildResult) {
         // if totalTests is equal to 1 then it should be at the lowest level of the itemsResponse hash
         if ((buildResult.status == 'FAILED') && (buildResult.totalTests == '1')) {
-          if ( worstTests[path] === undefined ) { worstTests[path] = [] }
           worstTests[path].push({buildNumber: buildResult.buildNumber, buildUrl: buildResult.url});
         }
       });

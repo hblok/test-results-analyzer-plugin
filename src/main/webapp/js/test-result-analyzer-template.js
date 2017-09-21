@@ -31,12 +31,6 @@ var tableContent = '<div class="table-row" name = "{{addName text}}" ' +
     '\n' + '{{> tableBodyTemplate this}}' +
     '{{/each}}';
 
-var worstTestsTableContent = '<div class="worst-tests-table-row">' +
-    '\n' + '         <div class="table-cell row-heading">{{k}}</div>' +
-    '\n' + '         <div class="table-cell build-result">{{v.length}}</div>' +
-    '\n' + '         <div class="table-cell build-result">{{{buildLinks v}}}</div>' +
-    '</div>'
-
 var tableBody = '<div class="heading">' +
     '\n' + '        <div class="table-cell">Chart</div> ' +
     '<div class="table-cell">Package/Class/Testmethod</div>' +
@@ -50,22 +44,6 @@ var tableBody = '<div class="heading">' +
     '{{> tableBodyTemplate}}' +
     '\n' + '{{/each}}';
 
-var worstTestsTableBody = '<h2 align="center">Top 10 Most Broken Tests</h2>' +
-    '\n' + '{{#if this.length}}' +
-    '<div class=table>' +
-    '\n' + '<div class="heading">' +
-    '\n' + '        <div class="table-cell">Test Name</div>' +
-    '\n' + '        <div class="table-cell">Times Failed</div>' +
-    '\n' + '        <div class="table-cell">Recent Failed Builds</div>' +
-    '\n' + '      </div>' +
-    '{{#each this}}' +
-    '{{> worstTestsTableBodyTemplate}}' +
-    '\n' + '{{/each}}' +
-    '</div>' +
-    '\n' + '{{else}}' +
-    '\n' + '<p>There are no failing tests</p>' +
-    '\n' + '{{/if}}';
-
 function removeSpecialChars(name){
     var modName = "";
     //modName = name.split('.').join('_');
@@ -74,7 +52,6 @@ function removeSpecialChars(name){
 }
 
 Handlebars.registerPartial("tableBodyTemplate", tableContent);
-Handlebars.registerPartial("worstTestsTableBodyTemplate", worstTestsTableContent);
 
 Handlebars.registerHelper('JSON2string', function (object) {
     return JSON.stringify(object);
@@ -169,6 +146,7 @@ Handlebars.registerHelper('failureIconWhenNecessary', function (buildResults) {
     }
 });
 
+
 Handlebars.registerHelper('percentPassed', function (buildResults) {
     var buildsPassed = 0;
     var buildsFailed = 0;
@@ -239,5 +217,4 @@ Handlebars.registerHelper('numberTransitions', function (buildResults) {
     return result;
 });
 
-var analyzerTemplate = Handlebars.compile(tableBody),
-    analyzerWorstTestsTemplate = Handlebars.compile(worstTestsTableBody);
+var analyzerTemplate = Handlebars.compile(tableBody);
