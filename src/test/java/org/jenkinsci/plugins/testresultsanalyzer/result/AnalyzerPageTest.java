@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.testresultanalyzer;
+package org.jenkinsci.plugins.testresultsanalyzer.result;
 
 import java.util.Arrays;
 
