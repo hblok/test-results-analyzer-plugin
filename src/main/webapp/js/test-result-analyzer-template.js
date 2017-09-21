@@ -5,8 +5,6 @@ var tableContent = '<div class="table-row" name = "{{addName text}}" ' +
                             'hierarchyLevel="0"' +
                          '{{/if}}' +
                    '>' +
-    '\n' + '         ' +
-    '\n' + '         ' +
 
     ' <div class="name row-heading table-cell" ' +
         '{{#if hierarchyLevel}}' +
@@ -20,13 +18,16 @@ var tableContent = '<div class="table-row" name = "{{addName text}}" ' +
         '&nbsp;{{text}}</span>' +
     '</div>' +
     '{{#each this.buildResults}}' +
-    '\n' + '         <div class="table-cell build-result {{applystatus status}}" data-result=\'{{JSON2string this}}\' ' +
-                          'title="Build {{buildNumber}}"><a href="{{url}}">{{applyvalue status totalTimeTaken}}</a></div>' +
-    '{{/each}}' +
-    '\n' + '</div>' +
-    '{{#each children}}\n' +
-    '\n' + '{{addHierarchy this ../hierarchyLevel}}' +
-    '\n' + '{{> tableBodyTemplate this}}' +
+    '         <div class="table-cell build-result {{applystatus status}}" data-result=\'{{JSON2string this}}\' ' +
+                          'title="Build {{buildNumber}}">' +
+                          '{{#hasStatus status}} <a href="{{url}}">{{applyvalue status totalTimeTaken}}</a> ' + 
+                          '{{else}} {{applyvalue status totalTimeTaken}} ' +
+                          '{{/hasStatus}} </div>' +
+      '{{/each}}' +
+    '</div>' +
+    '{{#each children}}' +
+        '{{addHierarchy this ../hierarchyLevel}}' +
+        '{{> tableBodyTemplate this}}' +
     '{{/each}}';
 
 var tableBody = '<div class="heading">' +
@@ -67,27 +68,19 @@ Handlebars.registerHelper('addName', function (name) {
 
 Handlebars.registerHelper('applyvalue', function (status, totalTimeTaken) {
     if (displayValues == true){
-        return isNaN(totalTimeTaken) ? 'N/A' : totalTimeTaken.toFixed(3) ;
-    }else{
-        var cs = "";
-        switch (status) {
-            case "FAILED":
-                cs = customStatuses['FAILED'];
-                break;
-            case "PASSED":
-                cs = customStatuses['PASSED'];
-                break;
-            case "SKIPPED":
-                cs = customStatuses['SKIPPED'];
-                break;
-            case "N/A":
-                cs = customStatuses['N/A'];
-                break;
-        }
-        return cs;
+        return isNaN(totalTimeTaken) ? '/' : totalTimeTaken.toFixed(3) ;
+    } else {
+    	return customStatuses[status];
     }
 });
 
+Handlebars.registerHelper('hasStatus', function (status, options) {
+    if(status != "N/A") {
+        return options.fn(this);
+    } else {
+        return options.inverse(this);
+    }
+});
 
 Handlebars.registerHelper('applystatus', function (status) {
     var statusClass = "no_status";

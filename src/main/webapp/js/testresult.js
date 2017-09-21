@@ -79,8 +79,6 @@ function getUserConfig(){
     }
     userConfig["noOfBuildsNeeded"] = noOfBuilds;
 
-    var hideConfig = $j("#hide-config-methods").is(":checked");
-    userConfig["hideConfigMethods"] = hideConfig;
     return userConfig;
 }
 

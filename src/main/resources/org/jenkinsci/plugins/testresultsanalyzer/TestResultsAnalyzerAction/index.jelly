@@ -82,10 +82,10 @@ Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Cl
 	var runtimeLowThreshold = "${it.runTimeLowThreshold}";
 	var runtimeHighThreshold = "${it.runTimeHighThreshold}";
     var customStatuses = {
-        'PASSED':'PASSED',
-        'SKIPPED':'SKIPPED',
-        'FAILED':'FAILED',
-        'N/A':'N/A'
+        'PASSED':'P',
+        'SKIPPED':'S',
+        'FAILED':'F',
+        'N/A':'/'
     }
 
 	jQuery(document).ready(function () {

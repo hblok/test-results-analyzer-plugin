@@ -61,10 +61,10 @@ public class TestResultsAnalyzerExtension extends TransientActionFactory<Job> im
         private final String passFailString = "passfail";
         private final String runtimeString = "runtime";
         private boolean useCustomStatusNames;
-        private String passedRepresentation = "PASSED";
-        private String failedRepresentation = "FAILED";
-        private String skippedRepresentation = "SKIPPED";
-        private String naRepresentation = "N/A";
+        private String passedRepresentation = "P";
+        private String failedRepresentation = "F";
+        private String skippedRepresentation = "S";
+        private String naRepresentation = "/";
 
         private boolean useCustomStatusColors;
         private String passedColor = PASSED_STATUS_COLOR;
