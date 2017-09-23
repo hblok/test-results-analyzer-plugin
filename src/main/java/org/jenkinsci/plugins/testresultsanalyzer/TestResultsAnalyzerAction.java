@@ -24,6 +24,7 @@ import org.jenkinsci.plugins.testresultsanalyzer.config.UserConfig;
 import org.jenkinsci.plugins.testresultsanalyzer.result.info.ResultInfo;
 import org.jenkinsci.plugins.testresultsanalyzer.result.data.ResultData;
 import org.jenkinsci.plugins.testresultsanalyzer.result.info.ClassInfo;
+import org.jenkinsci.plugins.testresultsanalyzer.result.info.NameExtractor;
 import org.jenkinsci.plugins.testresultsanalyzer.result.info.PackageInfo;
 import org.jenkinsci.plugins.testresultsanalyzer.result.info.TestCaseInfo;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
@@ -208,75 +209,21 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
         JsTreeUtil jsTreeUtils = new JsTreeUtil();
 		return jsTreeUtils.getJsTree(buildList, resultInfo, userConfig.isHideConfigMethods());
     }
-	
+    
 	@JavaScriptMethod
-    public String getExportCSV(String timeBased, String noOfBuildsNeeded) {
-		boolean isTimeBased = Boolean.parseBoolean(timeBased);
-        Map<String, PackageInfo> packageResults = resultInfo.getPackageResults();
-		int noOfBuilds = getNoOfBuildRequired(noOfBuildsNeeded);
+	public JSONObject getHeaders(UserConfig userConfig) {
+		if (resultInfo == null) {
+			return new JSONObject();
+		}
+
+		int noOfBuilds = getNoOfBuildRequired(userConfig.getNoOfBuildsNeeded());
 		List<Integer> buildList = getBuildList(noOfBuilds);
 
-		String buildsString = "";
-        for (int i = 0; i < buildList.size(); i++) {
-            buildsString += ",\"" + Integer.toString(builds.get(i)) + "\"";
-        }		
-        String header = "\"Package\",\"Class\",\"Test\"";
-        header += buildsString;
+		JSONObject result = new JSONObject();
+		result.put("builds", JSONArray.fromObject(buildList));
+		result.put("names", NameExtractor.toJson(resultInfo));
 
-		StringBuilder exportBuilder = new StringBuilder();
-        exportBuilder.append(header + System.lineSeparator());
-		DecimalFormat decimalFormat = new DecimalFormat("#.###");
-		decimalFormat.setRoundingMode(RoundingMode.CEILING);
-        for (PackageInfo pInfo : packageResults.values()) {
-            String packageName = pInfo.getName();
-            //loop the classes
-            for (ClassInfo cInfo : pInfo.getClasses().values()) {
-                String className = cInfo.getName();
-                //loop the tests
-                for (TestCaseInfo tInfo : cInfo.getTests().values()) {
-                    String testName = tInfo.getName();
-                    exportBuilder.append("\""+ packageName + "\",\"" + className + "\",\"" + testName+"\"");
-					Map<Integer, ResultData> buildPackageResults = tInfo.getBuildPackageResults();
-					for (int i = 0; i < buildList.size(); i++) {
-						Integer buildNumber = buildList.get(i);
-						String data = getCustomStatus("NA");
-						if(buildPackageResults.containsKey(buildNumber)) {
-							ResultData buildResult = buildPackageResults.get(buildNumber);
-							if(!isTimeBased) {
-								data = getCustomStatus(buildResult.getStatus());
-							} else {
-								data = decimalFormat.format(buildResult.getTotalTimeTaken());
-							}
-						}
-						exportBuilder.append(",\"" + data + "\"");
-					}
-                    exportBuilder.append(System.lineSeparator());
-                }
-            }
-        }
-        return exportBuilder.toString();
-    }
-
-	private String getCustomStatus(String status) {
-		ResultStatus resultStatus = null;
-		try {
-			resultStatus = ResultStatus.valueOf(status);
-		} catch (IllegalArgumentException e) {
-
-		}
-		if (resultStatus == null)
-			return status;
-		switch (resultStatus) {
-			case PASSED:
-				return getPassedRepresentation();
-			case FAILED:
-				return getFailedRepresentation();
-			case SKIPPED:
-				return getSkippedRepresentation();
-			case NA:
-				return getNaRepresentation();
-		}
-		return status;
+		return result;
 	}
 
 	public String getNoOfBuilds() {

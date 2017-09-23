@@ -59,6 +59,7 @@ function populateTemplate(){
     reset();
     displayValues  = $j("#show-build-durations").is(":checked");
     $j("#table-loading").show();
+    
     remoteAction.getTreeResult(getUserConfig(),$j.proxy(function(t) {
         var itemsResponse = t.responseObject();
         $j(".test-history-table").html(
@@ -67,6 +68,11 @@ function populateTemplate(){
         addEvents();
         $j("#table-loading").hide();
     },this));
+    
+    remoteAction.getHeaders(getUserConfig(),$j.proxy(function(t) {
+        console.log(t.responseObject());
+    },this));
+    
 }
 
 function getUserConfig(){
