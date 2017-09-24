@@ -78,7 +78,7 @@ public class JsTreeUtil {
             json.put("totalPassed", result.getTotalPassed());
             json.put("totalSkipped", result.getTotalSkipped());
             json.put("totalTimeTaken", result.getTotalTimeTaken());
-            json.put("status", result.getStatus());
+            json.put("status", result.getStatus().name());
             json.put("url", result.getUrl());
         }
 

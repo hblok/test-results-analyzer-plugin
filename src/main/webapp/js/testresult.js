@@ -69,7 +69,7 @@ function populateTemplate(){
         $j("#table-loading").hide();
     },this));
     
-    remoteAction.getHeaders(getUserConfig(),$j.proxy(function(t) {
+    remoteAction.getTestResults(getUserConfig(),$j.proxy(function(t) {
         console.log(t.responseObject());
     },this));
     

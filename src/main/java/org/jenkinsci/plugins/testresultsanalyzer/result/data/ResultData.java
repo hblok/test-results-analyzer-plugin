@@ -13,7 +13,7 @@ public abstract class ResultData {
 	private int totalPassed;
 	private int totalSkipped;
 	private float totalTimeTaken;
-	private String status;
+	private ResultStatus status;
     private String url;
 
 	public String getName() {
@@ -107,17 +107,17 @@ public abstract class ResultData {
 
 	protected void evaluateStatus() {
 		if (totalSkipped == totalTests) {
-			status = "SKIPPED";
+			status = ResultStatus.SKIPPED;
 		}
 		else if (totalFailed == 0) {
-			status = "PASSED";
+			status = ResultStatus.PASSED;
 		}
 		else {
-			status = "FAILED";
+			status = ResultStatus.FAILED;
 		}
 	}
 
-	public String getStatus() {
+	public ResultStatus getStatus() {
 		return status;
 	}
 

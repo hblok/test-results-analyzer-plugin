@@ -1,11 +1,13 @@
 package org.jenkinsci.plugins.testresultsanalyzer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 //import org.apache.log4j.Logger;
 import org.jenkinsci.plugins.testresultsanalyzer.config.UserConfig;
+import org.jenkinsci.plugins.testresultsanalyzer.result.info.JsonTestResults;
 import org.jenkinsci.plugins.testresultsanalyzer.result.info.NameExtractor;
 import org.jenkinsci.plugins.testresultsanalyzer.result.info.ResultInfo;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
@@ -145,7 +147,7 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 		if (!isUpdated()) {
 			return;
 		}
-
+		
 		resultInfo = new ResultInfo();
 		builds = new ArrayList<Integer>();
 
@@ -220,6 +222,22 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 
 		return result;
 	}
+	
+	@JavaScriptMethod
+	public JSONObject getTestResults(UserConfig userConfig) {
+		if (resultInfo == null) {
+			return new JSONObject();
+		}
+
+		int noOfBuilds = getNoOfBuildRequired(userConfig.getNoOfBuildsNeeded());
+		List<Integer> buildIds = getBuildList(noOfBuilds);
+
+		JSONObject result = new JSONObject();
+		result.put("builds", JSONArray.fromObject(buildIds));
+		result.put("results", JsonTestResults.getJson(resultInfo, buildIds));
+
+		return result;
+	}	
 
 	public String getNoOfBuilds() {
 		return TestResultsAnalyzerExtension.DESCRIPTOR.getNoOfBuilds();
