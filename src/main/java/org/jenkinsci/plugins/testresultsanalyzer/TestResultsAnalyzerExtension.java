@@ -40,10 +40,10 @@ public class TestResultsAnalyzerExtension extends TransientActionFactory<Job> im
 
     public static class DescriptorImpl extends Descriptor<TestResultsAnalyzerExtension> {
 
-        private static final String PASSED_STATUS_COLOR = "#92D050";
-        private static final String FAILED_STATUS_COLOR = "#F37A7A";
-        private static final String SKIP_STATUS_COLOR = "#FDED72";
-        private static final String NA_STATUS_COLOR = "#E8F5FF";
+        private static final String PASSED_STATUS_COLOR = "#d4efd4";
+        private static final String FAILED_STATUS_COLOR = "#ffc8c2";
+        private static final String SKIP_STATUS_COLOR = "#f1ecc4";
+        private static final String NA_STATUS_COLOR = "#f6f7f7";
         private static final String PASSED_REPRESENTATION = "PASSED";
         private static final String FAILED_REPRESENTATION = "FAILED";
         private static final String SKIPPED_REPRESENTATION = "SKIPPED";

@@ -92,14 +92,19 @@
 		border: 1px solid rgb(150, 171, 239);
 	}
 
-	.build-result{
-		font-size: 14px;
+	.build-result, .build-result a {
+		font-size: 15px;
+		text-decoration: none;
 	}
-    
+	
+	a.build-result {
+	  text-decoration: none;
+	}
+	    
 	.heading {
         font-weight: bold;
         border-bottom: 2px solid #6678b1;
-        background: #BBCBFF;
+        background: #e0e6f8;
 		text-align: center;
 		box-sizing: border-box;
 		font-family: Patua One, sans-serif;

@@ -1,40 +1,35 @@
 package org.jenkinsci.plugins.testresultsanalyzer;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+//import org.apache.log4j.Logger;
+import org.jenkinsci.plugins.testresultsanalyzer.config.UserConfig;
+import org.jenkinsci.plugins.testresultsanalyzer.result.info.NameExtractor;
+import org.jenkinsci.plugins.testresultsanalyzer.result.info.ResultInfo;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
+
 import hudson.model.Action;
+import hudson.model.Actionable;
 import hudson.model.Item;
 import hudson.model.Job;
-import hudson.model.Actionable;
 import hudson.model.Run;
+import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.AggregatedTestResultAction;
 import hudson.tasks.test.TabulatedResult;
-import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 import hudson.util.RunList;
-
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.*;
-
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
-import org.apache.log4j.Logger;
-import org.jenkinsci.plugins.testresultsanalyzer.config.UserConfig;
-import org.jenkinsci.plugins.testresultsanalyzer.result.info.ResultInfo;
-import org.jenkinsci.plugins.testresultsanalyzer.result.data.ResultData;
-import org.jenkinsci.plugins.testresultsanalyzer.result.info.ClassInfo;
-import org.jenkinsci.plugins.testresultsanalyzer.result.info.NameExtractor;
-import org.jenkinsci.plugins.testresultsanalyzer.result.info.PackageInfo;
-import org.jenkinsci.plugins.testresultsanalyzer.result.info.TestCaseInfo;
-import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 public class TestResultsAnalyzerAction extends Actionable implements Action {
 
 	@SuppressWarnings("rawtypes")
 	Job project;
 	private List<Integer> builds = new ArrayList<Integer>();
-	private final static Logger LOG = Logger.getLogger(TestResultsAnalyzerAction.class.getName());
+	//private final static Logger LOG = Logger.getLogger(TestResultsAnalyzerAction.class.getName());
 
 	ResultInfo resultInfo;
 
@@ -193,7 +188,7 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 				resultInfo.addPackage(buildNumber, (TabulatedResult) packageResult, Jenkins.getInstance().getRootUrl() + run.getUrl());
 			}
 		} catch (ClassCastException e) {
-			LOG.info("Got ClassCast exception while converting results to Tabulated Result from action: " + testAction.getClass().getName() + ". Ignoring as we only want test results for processing.");
+			//LOG.info("Got ClassCast exception while converting results to Tabulated Result from action: " + testAction.getClass().getName() + ". Ignoring as we only want test results for processing.");
 		}
 	}
 

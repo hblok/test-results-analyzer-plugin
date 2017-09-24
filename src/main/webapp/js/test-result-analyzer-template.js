@@ -1,16 +1,7 @@
-var tableContent = '<div class="table-row" name = "{{addName text}}" ' +
-                         '{{#if hierarchyLevel}}' +
-                            'hierarchyLevel="{{hierarchyLevel}}" style="display:none"' +
-                         '{{else}}' +
-                            'hierarchyLevel="0"' +
-                         '{{/if}}' +
-                   '>' +
+var tableContent = 
+	'<div class="table-row" name = "{{addName text}}">' +
 
-    ' <div class="name row-heading table-cell" ' +
-        '{{#if hierarchyLevel}}' +
-            'style="padding-left:{{addspaces hierarchyLevel}}em;"' +
-        '{{/if}}' +
-    '>' +
+    ' <div class="name row-heading table-cell">' +
         '{{#if children}}' +
             '<span class="icon icon-plus-sign" title="Show Children"></span> ' +
         '{{/if}}' +
@@ -18,27 +9,28 @@ var tableContent = '<div class="table-row" name = "{{addName text}}" ' +
         '&nbsp;{{text}}</span>' +
     '</div>' +
     '{{#each this.buildResults}}' +
-    '         <div class="table-cell build-result {{applystatus status}}" data-result=\'{{JSON2string this}}\' ' +
-                          'title="Build {{buildNumber}}">' +
-                          '{{#hasStatus status}} <a href="{{url}}">{{applyvalue status totalTimeTaken}}</a> ' + 
-                          '{{else}} {{applyvalue status totalTimeTaken}} ' +
-                          '{{/hasStatus}} </div>' +
-      '{{/each}}' +
+      '<div class="table-cell build-result {{applystatus status}}" ' +
+		  'title="Build {{buildNumber}}">' +
+		  '{{#hasStatus status}} <a href="{{url}}">{{applyvalue status totalTimeTaken}}</a> ' + 
+		  '{{else}} {{applyvalue status totalTimeTaken}} ' +
+		  '{{/hasStatus}} </div>' +
+	  '{{/each}}' +
     '</div>' +
+    
     '{{#each children}}' +
-        '{{addHierarchy this ../hierarchyLevel}}' +
         '{{> tableBodyTemplate this}}' +
     '{{/each}}';
 
 var tableBody = '<div class="heading">' +
     '<div class="table-cell">Package/Class/Testmethod</div>' +
     '{{#each builds}}' +
-    '\n' + '         <div class="table-cell" title="Build {{this}}">{{this}}</div>' +
+    '  <div class="table-cell" title="Build {{this}}">{{this}}</div>' +
     '{{/each}}' +
-    '\n' + '      </div>' +
+    '</div>' +
+    
     '{{#each results}}' +
     '{{> tableBodyTemplate}}' +
-    '\n' + '{{/each}}';
+    '{{/each}}';
 
 function removeSpecialChars(name){
     var modName = "";
@@ -96,29 +88,6 @@ Handlebars.registerHelper('applystatus', function (status) {
             break;
     }
     return statusClass;
-});
-
-Handlebars.registerHelper('addspaces', function (hierarchyLevel) {
-    var spaces = 1.5;
-
-    spaces = spaces * hierarchyLevel;
-    return new Handlebars.SafeString(spaces);
-});
-
-Handlebars.registerHelper('addIndent', function (hierarchyLevel) {
-    var parent = "|"
-    var ident = "-";
-    for(var i =0;i<hierarchyLevel;i++){
-        ident = ident + ident;
-    }
-
-    return new Handlebars.SafeString(parent+ident);
-});
-
-Handlebars.registerHelper('addHierarchy', function (context, parentHierarchy, options) {
-    if (parentHierarchy == undefined)
-        parentHierarchy = 0;
-    context["hierarchyLevel"] = parentHierarchy + 1;
 });
 
 Handlebars.registerHelper('failureIconWhenNecessary', function (buildResults) {
