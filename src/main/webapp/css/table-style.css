@@ -76,6 +76,10 @@ img {
 	display: table-row;
 }
 
+.row-hidden {
+	display: none;
+}
+
 .table-cell {
 	display: table-cell;
 	padding: 10px;

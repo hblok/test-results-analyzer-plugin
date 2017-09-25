@@ -1,7 +1,3 @@
-var colTemplate = "{'cellClass':'col1','value':'build20','header':'20','title':'20'}";
-var reevaluateChartData = true;
-var displayValues = false;
-
 function clearedFilter(rows) {
     var levelsToShow = [0]; // stack to keep track of hierarchy
 
@@ -50,8 +46,7 @@ function searchTests(){
     }
 }
 
-function reset(){
-    reevaluateChartData = true;
+function reset() {
     $j(".test-history-table").html("");
 }
 
@@ -87,7 +82,7 @@ function createTable(data) {
 }
 
 function createHeader(parentDom, buildIds) {
-	var rowDom = createRow(parentDom, "heading", "Package / Class / Test");
+	var rowDom = createRow(parentDom, "heading", -1, "Package / Class / Test");
 	
 	for(var i = 0; i < buildIds.length; i++) {
 		var cell = $j("<div>")
@@ -98,7 +93,7 @@ function createHeader(parentDom, buildIds) {
 }
 
 function createPackageRow(parentDom, packName, pack) {
-	var rowDom = createRow(parentDom, "package", packName);
+	var rowDom = createRow(parentDom, "package", 0, packName);
 
 	var classes = Object.keys(pack);
 	for (var c in classes) {
@@ -112,7 +107,7 @@ function createPackageRow(parentDom, packName, pack) {
 }
 	
 function createClassRow(parentDom, className, klass) {
-	var rowDom = createRow(parentDom, "class", className);
+	var rowDom = createRow(parentDom, "class", 1, className);
 
 	var tests = Object.keys(klass);
 	for (var t in tests) {
@@ -133,7 +128,7 @@ var STATUSCSSMAP = {
 };
 
 function createTestResults(parentDom, testName, results) {
-	var rowDom = createRow(parentDom, "test", testName);
+	var rowDom = createRow(parentDom, "test", 2, testName);
 
 	for (var i = 0; i < results.length; i++) {
 		var status = results[i];
@@ -146,10 +141,14 @@ function createTestResults(parentDom, testName, results) {
 	}
 }
 
-function createRow(parentDom, rowType, name) {
+function createRow(parentDom, rowType, level, name) {
 	var rowDom = $j("<div>")
 		.addClass("table-row")
-		.addClass(rowType);
+		.attr("level", level);
+
+	if (rowType == "class" || rowType == "test") {
+		rowDom.addClass("row-hidden");
+	}
 	
 	var nameDom = $j("<div>")
 		.addClass("name")
@@ -158,15 +157,41 @@ function createRow(parentDom, rowType, name) {
 		.appendTo(rowDom);
 		
 	if (rowType == "package" || rowType == "class" ) {
-		$j("<div>")
+		var expand = $j("<div>")
 			.addClass("icon")
 			.addClass("icon-plus-sign")
-			.prependTo(nameDom);
+			.prependTo(nameDom)
+			.click(rowDom, handleExpand);
 	}
 		
 	parentDom.append(rowDom);
 	
 	return rowDom;
+}
+
+function handleExpand(src) {
+	var row = $j(src.data);
+	var icon = row.find(".icon");
+	var expand = icon.hasClass("icon-plus-sign");
+	var level = parseInt(row.attr("level"));
+
+	icon.removeClass(expand ? "icon-plus-sign" : "icon-minus-sign");
+	icon.addClass(expand ? "icon-minus-sign" : "icon-plus-sign");
+
+	var next = row.next();
+	var nextLevel = parseInt(next.attr("level"));
+	while (next.length > 0 && nextLevel > level) {
+		if (nextLevel == level + 1 && expand) {
+			next.removeClass("row-hidden");
+		} else if (nextLevel > level && !expand) {
+			next.addClass("row-hidden");
+			var icons = next.find(".icon");
+			icons.removeClass("icon-minus-sign");
+			icons.addClass("icon-plus-sign");
+		}
+		next = next.next();
+		nextLevel = parseInt(next.attr("level"));
+	}
 }
 
 function getUserConfig(){
@@ -180,8 +205,4 @@ function getUserConfig(){
     userConfig["noOfBuildsNeeded"] = noOfBuilds;
 
     return userConfig;
-}
-
-function resetAdvancedOptions(){
-    $j("#show-build-durations").prop('checked', false);
 }
