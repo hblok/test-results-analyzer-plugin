@@ -160,7 +160,7 @@ function createRow(parentDom, rowType, name) {
 	if (rowType == "package" || rowType == "class" ) {
 		$j("<div>")
 			.addClass("icon")
-			.addClass(".icon-plus-sign")
+			.addClass("icon-plus-sign")
 			.prependTo(nameDom);
 	}
 		
