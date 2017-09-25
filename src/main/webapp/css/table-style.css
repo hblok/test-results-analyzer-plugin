@@ -31,7 +31,8 @@ img {
 	width: 14px;
 	height: 14px;
 	display: inline-block;
-    margin-left: 2px;
+	margin-left: 2px;
+	margin-right: 5px;
 }
 
 .icon-plus-sign {
@@ -128,17 +129,17 @@ button {
 }
 
 .passed {
-	background: "#d4efd4";
+	background: #d4efd4;
 }
 
 .failed {
-	background: "#ffc8c2";
+	background: #ffc8c2;
 }
 
 .skipped {
-	background: "#f1ecc4";
+	background: #f1ecc4;
 }
 
 .na {
-	background: "#f6f7f7";
+	background: #f6f7f7;
 }
