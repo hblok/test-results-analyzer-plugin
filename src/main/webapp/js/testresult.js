@@ -60,6 +60,7 @@ function populateTemplate(){
     displayValues  = $j("#show-build-durations").is(":checked");
     $j("#table-loading").show();
     
+    /*
     remoteAction.getTreeResult(getUserConfig(),$j.proxy(function(t) {
         var itemsResponse = t.responseObject();
         $j(".test-history-table").html(
@@ -68,11 +69,45 @@ function populateTemplate(){
         addEvents();
         $j("#table-loading").hide();
     },this));
-    
+    */
     remoteAction.getTestResults(getUserConfig(),$j.proxy(function(t) {
         console.log(t.responseObject());
+        createTable(t.responseObject());
+        $j("#table-loading").hide();
     },this));
     
+}
+
+function createTable(data) {
+	var buildIds = data["builds"];
+	var results = data["results"];
+	
+	
+	var table = $j(".test-history-table");
+	console.log("table: ");
+	console.log(table);
+
+	var packs = Object.keys(results);
+	for (var p in packs) {
+		var pname = packs[p];
+		console.log(pname);
+		var pack = results[pname];
+		
+		var classes = Object.keys(pack);
+		for (var c in classes) {
+			var cname = classes[c];
+			console.log(cname);
+			var klass = pack[cname];
+			
+			var tests = Object.keys(klass);
+			for (var t in tests) {
+				var tname = tests[t];
+				var results = klass[tname];
+				console.log(tname + results);
+			}
+		}
+	}
+	
 }
 
 function getUserConfig(){

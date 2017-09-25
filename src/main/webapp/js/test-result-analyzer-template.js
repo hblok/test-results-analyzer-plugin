@@ -1,6 +1,10 @@
 var tableContent = 
-	'<div class="table-row" name = "{{addName text}}">' +
+	'<div class="table-row" name="{{addName this}}">' +
+	'{{this}}'
+	'</div>';
 
+	
+/*	
     ' <div class="name row-heading table-cell">' +
         '{{#if children}}' +
             '<span class="icon icon-plus-sign" title="Show Children"></span> ' +
@@ -20,22 +24,27 @@ var tableContent =
     '{{#each children}}' +
         '{{> tableBodyTemplate this}}' +
     '{{/each}}';
+*/
 
 var tableBody = '<div class="heading">' +
-    '<div class="table-cell">Package/Class/Testmethod</div>' +
+    '<div class="table-cell">Package / Class / Testmethod</div>' +
     '{{#each builds}}' +
     '  <div class="table-cell" title="Build {{this}}">{{this}}</div>' +
     '{{/each}}' +
     '</div>' +
     
+    '{{addName results }}' +
+    
     '{{#each results}}' +
-    '{{> tableBodyTemplate}}' +
+    '  {{this}}' +
+    '  {{addName this}}' +
     '{{/each}}';
 
 function removeSpecialChars(name){
     var modName = "";
+    console.log(name);
     //modName = name.split('.').join('_');
-    modName = name.replace(/[^a-z\d/-]+/gi, "_");
+    modName = String(name).replace(/[^a-z\d/-]+/gi, "_");
     return modName;
 }
 
