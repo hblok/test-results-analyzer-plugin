@@ -4,16 +4,9 @@
 <st:bind var="remoteAction" value="${it}"/> 
 <l:main-panel>
 <link href="${resURL}/plugin/test-results-analyzer/css/table-style.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/jquery/js/jquery-1.11.1.min.js"></script>
-
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/handlebars-v2.0.0.js"></script>
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/highcharts.js"></script>
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/json3-min.js"></script>
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/highchart-exporting.js"></script>
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/highchart-offline-exporting.js"></script>
+<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/jquery/js/jquery-3.2.1.min.js"></script>
 
 <script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/testresult.js"></script>
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/test-result-analyzer-template.js"></script>
 <script>
 
 var $j = jQuery.noConflict();

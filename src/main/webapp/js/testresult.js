@@ -57,57 +57,116 @@ function reset(){
 
 function populateTemplate(){
     reset();
-    displayValues  = $j("#show-build-durations").is(":checked");
+    
     $j("#table-loading").show();
     
-    /*
-    remoteAction.getTreeResult(getUserConfig(),$j.proxy(function(t) {
-        var itemsResponse = t.responseObject();
-        $j(".test-history-table").html(
-            analyzerTemplate(itemsResponse)
-        );
-        addEvents();
-        $j("#table-loading").hide();
-    },this));
-    */
     remoteAction.getTestResults(getUserConfig(),$j.proxy(function(t) {
         console.log(t.responseObject());
         createTable(t.responseObject());
         $j("#table-loading").hide();
     },this));
-    
 }
 
 function createTable(data) {
 	var buildIds = data["builds"];
 	var results = data["results"];
 	
-	
 	var table = $j(".test-history-table");
-	console.log("table: ");
-	console.log(table);
+	
+	createHeader(table, buildIds);
 
 	var packs = Object.keys(results);
 	for (var p in packs) {
+		if(!packs.hasOwnProperty(p)) continue;
+	
 		var pname = packs[p];
-		console.log(pname);
 		var pack = results[pname];
 		
-		var classes = Object.keys(pack);
-		for (var c in classes) {
-			var cname = classes[c];
-			console.log(cname);
-			var klass = pack[cname];
-			
-			var tests = Object.keys(klass);
-			for (var t in tests) {
-				var tname = tests[t];
-				var results = klass[tname];
-				console.log(tname + results);
-			}
-		}
+		createPackageRow(table, pname, pack);
 	}
+}
+
+function createHeader(parentDom, buildIds) {
+	var rowDom = createRow(parentDom, "heading", "Package / Class / Test");
 	
+	for(var i = 0; i < buildIds.length; i++) {
+		var cell = $j("<div>")
+			.addClass("table-cell")
+			.text(buildIds[i])
+			.appendTo(rowDom);
+	}		
+}
+
+function createPackageRow(parentDom, packName, pack) {
+	var rowDom = createRow(parentDom, "package", packName);
+
+	var classes = Object.keys(pack);
+	for (var c in classes) {
+		if(!classes.hasOwnProperty(c)) continue;
+	
+		var cname = classes[c];
+		var klass = pack[cname];
+		
+		createClassRow(parentDom, cname, klass);
+	}
+}
+	
+function createClassRow(parentDom, className, klass) {
+	var rowDom = createRow(parentDom, "class", className);
+
+	var tests = Object.keys(klass);
+	for (var t in tests) {
+		if(!tests.hasOwnProperty(t)) continue;
+	
+		var tname = tests[t];
+		var results = klass[tname];
+		
+		createTestResults(parentDom, tname, results);
+	}
+}
+
+var STATUSCSSMAP = {
+	"P": "passed",
+	"F": "failed",
+	"S": "skipped",
+	"/": "na"
+};
+
+function createTestResults(parentDom, testName, results) {
+	var rowDom = createRow(parentDom, "test", testName);
+
+	for (var i = 0; i < results.length; i++) {
+		var status = results[i];
+		var cell = $j("<div>")
+			.addClass("table-cell")
+			.addClass("build-result")
+			.addClass(STATUSCSSMAP[status])
+			.text(status)
+			.appendTo(rowDom);
+	}
+}
+
+function createRow(parentDom, rowType, name) {
+	var rowDom = $j("<div>")
+		.addClass("table-row")
+		.addClass(rowType);
+	
+	var nameDom = $j("<div>")
+		.addClass("name")
+		.addClass("name-" + rowType)
+		.text(name)
+		.appendTo(rowDom);
+		
+	if (rowType == "package" || rowType == "class" ) {
+		$j("<div>")
+			.addClass("icon")
+			.addClass(".icon-plus-sign")
+			.prependTo(nameDom);
+	}
+		
+	parentDom.append(rowDom);
+	
+	return rowDom;
 }
 
 function getUserConfig(){
@@ -123,232 +182,6 @@ function getUserConfig(){
     return userConfig;
 }
 
-function changeToExpandedState(node) {
-    if ($j(node).hasClass('icon-plus-sign')) {
-        $j(node).removeClass('icon-plus-sign');
-        $j(node).addClass('icon-minus-sign');
-        $j(node).attr('title', 'Hide Children');
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function changeToCollapsedState(node) {
-    if ($j(node).hasClass('icon-minus-sign')) {
-        $j(node).removeClass('icon-minus-sign');
-        $j(node).addClass('icon-plus-sign');
-        $j(node).attr('title', 'Show Children');
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function collapseAll(){
-    reevaluateChartData = true;
-    $j(".test-history-table .icon-minus-sign").each(function() {
-        changeToCollapsedState($j(this));
-    });
-    $j(".test-history-table .table-row").each(function (index, element) {
-        var elementLevel = parseInt($j(element).attr("hierarchyLevel"));
-        if (elementLevel == 0) {
-            $j(element).show();
-        } else {
-            $j(element).hide();
-        }
-    });
-}
-
-function expandAll() {
-    reevaluateChartData = true;
-    $j(".test-history-table .icon-plus-sign").each(function() {
-        changeToExpandedState($j(this));
-    });
-    $j(".test-history-table .table-row").show();
-}
-
-function getDescendants(parentRow, level) {
-    var parentLevel = parseInt($(parentRow).attr("hierarchyLevel"));
-    var descendantLevel = parentLevel + level;
-    var done = false;
-
-    return $j(parentRow).nextAll().filter(function(index, element) {
-        if (done) {
-          return false;
-        }
-
-        var elementLevel = parseInt($j(element).attr("hierarchyLevel"));
-        if (parentLevel >= elementLevel) {
-          // not a descendant, done
-          done = true;
-          return false;
-        } else if (level == -1 || elementLevel <= descendantLevel) {
-          return true;
-        } else {
-          // a descendant, but not in the scope of level
-          return false;
-        }
-    });
-}
-
-function getAllDescendants(parentRow) {
-    return getDescendants(parentRow, -1);
-}
-
-function getAllAncestors(parentRow) {
-    var result = [];
-
-    var parentLevel = parseInt($(parentRow).attr("hierarchyLevel"));
-    var nextAncestorLevel = parentLevel - 1;
-
-    var done = parentLevel < 0; // might not have any ancestors
-    return $j(parentRow).prevAll().filter(function (index, element) {
-        if (done) {
-            return false;
-        }
-
-        var elementLevel = parseInt($j(element).attr("hierarchyLevel"));
-        if (elementLevel === nextAncestorLevel) {
-            nextAncestorLevel -= 1;
-            if (nextAncestorLevel < 0) {
-                // last ancestors found
-                done = true;
-            }
-
-            return true;
-        } else {
-            return false;
-        }
-    });
-}
-
-function getSiblings(row) {
-    var level = parseInt($j(row).attr("hierarchyLevel"));
-
-    var done = false;
-    var isSibling = function(index, element) {
-        if (done) {
-            return false;
-        }
-
-        var elementLevel = parseInt($j(element).attr("hierarchyLevel"));
-        if (elementLevel == level) {
-            return true;
-        } else if (elementLevel < level) {
-            // at a parent or uncle, so cannot be a sibling
-            done = true;
-            return false;
-        } else {
-            // another descendant that is not a sibling
-            return false;
-        }
-    };
-
-    var previousSiblings = $j(row).prevAll().filter(isSibling);
-
-    done = false;
-    var followingSiblings = $j(row).nextAll().filter(isSibling);
-
-    return $(previousSiblings).add(followingSiblings);
-}
-
-function addEvents() {
-
-    var toggleHandler = function (node) {
-        var row = $j(node).parent().parent(".table-row");
-        if (changeToExpandedState(node)) {
-            $j(getDescendants(row, 1)).show();
-
-            // When a filter is applied you can look at nodes currently not visible in the hierarchy,
-            // thus you have to ensure that the ancestors' state is updated correctly, so that all display
-            // the minus sign.
-            // This keeps the invariant that to expand a child its parent has to be expanded too.
-            var filter = $j("#filter").val();
-            if (filter != "") {
-                $j(getAllAncestors(row)).each(function (index, element) {
-                    changeToExpandedState($j(element).find('.icon-plus-sign'));
-                });
-            }
-        } else if (changeToCollapsedState(node)) {
-            $j(getAllDescendants(row)).hide().each(function (index, element) {
-                changeToCollapsedState($j(element).find('.icon-minus-sign'));
-            });
-        }
-    };
-
-    $j(".test-history-table .table-row .icon").click(function () {
-        toggleHandler(this);
-    });
-    checkBoxEvents();
-}
-
-function checkBoxEvents() {
-    var table = $j(".test-history-table")[0];
-    $j(table).find("input[type='checkbox']").change(function () {
-        reevaluateChartData = true;
-
-        var row = $j(this).parent().parent(".table-row");
-        var check = this.checked;
-        checkChildren(row, check);
-        checkParent(row, check);
-    });
-}
-
-function checkChildren(row, checked) {
-    $j(getAllDescendants(row)).find("input[type='checkbox']").prop("checked", checked);
-}
-
-function areAllSiblingsChecked(row) {
-    var siblings = getSiblings(row);
-    return $(siblings).find("input:checked").length == siblings.length;
-}
-
-function checkParent(row, checked) {
-    var ancestors = getAllAncestors(row);
-    var ancestorsLength = ancestors.length;
-
-    if (checked) {
-        var child = row;
-        $j(ancestors).each(function (index, element) {
-            if (areAllSiblingsChecked(child)) {
-                $j(element).find("input[type='checkbox']").prop("checked", checked);
-                child = element;
-            } else {
-                return false;
-            }
-        });
-    } else {
-        $j(ancestors).find("input[type='checkbox']").prop("checked", checked);
-    }
-}
-
 function resetAdvancedOptions(){
     $j("#show-build-durations").prop('checked', false);
-}
-
-function compareInteger(integer1, integer2) {
-  if (parseInt(integer1) > parseInt(integer2)) return 1;
-  else if (parseInt(integer1) < parseInt(integer2)) return -1;
-  else return 0;
-}
-
-function findChildren(hash, path = '') {
-  if ( hash.text != undefined ) { path += (path == '') ? hash.text : '.' + hash.text }
-  $j.each(hash, function( index, value ) {
-    if ( index == 'children' && value.length > 0 ) {
-      findChildren(value, path);
-    } else if ( index == 'buildResults' ) {
-      $j.each(value, function(index1, buildResult) {
-        // if totalTests is equal to 1 then it should be at the lowest level of the itemsResponse hash
-        if ((buildResult.status == 'FAILED') && (buildResult.totalTests == '1')) {
-          worstTests[path].push({buildNumber: buildResult.buildNumber, buildUrl: buildResult.url});
-        }
-      });
-    } else if ( $j.type(value) == 'object' ) {
-      findChildren(value, path);
-    } else if ( $j.isArray(value) ) {
-      findChildren(value, path);
-    }
-  });
 }
