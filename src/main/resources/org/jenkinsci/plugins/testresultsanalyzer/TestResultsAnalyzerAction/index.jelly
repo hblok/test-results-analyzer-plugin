@@ -1,12 +1,13 @@
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
 <l:layout title="Test Result Graph">
 <st:include it="${it.project}" page="sidepanel.jelly" />
 <st:bind var="remoteAction" value="${it}"/> 
 <l:main-panel>
-<link href="${resURL}/plugin/test-results-analyzer/css/table-style.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/jquery/js/jquery-3.2.1.min.js"></script>
+<link href="${resURL}/plugin/thor-test-results-history-overview/css/table-style.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="${resURL}/plugin/thor-test-results-history-overview/jquery/js/jquery-3.2.1.min.js"></script>
 
-<script type="text/javascript" src="${resURL}/plugin/test-results-analyzer/js/testresult.js"></script>
+<script type="text/javascript" src="${resURL}/plugin/thor-test-results-history-overview/js/testresult.js"></script>
 <script>
 
 var $j = jQuery.noConflict();
@@ -60,7 +61,7 @@ Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Cl
 <br/>
 <div id="tree">
    <div id="table-loading" style="display: none;">
-       <img src="${resURL}/plugin/test-results-analyzer/images/loading2.gif"/>
+       <img src="${resURL}/plugin/thor-test-results-history-overview/images/loading2.gif"/>
    </div>
 
    <div class="test-history-table table">

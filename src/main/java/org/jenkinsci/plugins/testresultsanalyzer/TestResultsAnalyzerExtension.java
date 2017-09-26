@@ -82,7 +82,7 @@ public class TestResultsAnalyzerExtension extends TransientActionFactory<Job> im
 
         @Override
         public String getDisplayName() {
-            return "Test Results Analyzer";
+            return "THOR - Test Results History Overview";
         }
 
         @Override

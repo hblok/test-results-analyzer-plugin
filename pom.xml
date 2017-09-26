@@ -1,13 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   
-  <artifactId>test-results-analyzer</artifactId>
-  <version>0.3.5-SNAPSHOT</version>
+  <artifactId>thor-test-results-history-overview</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
-  <name>Test Results Analyzer Plugin</name>
-  <url>http://wiki.jenkins-ci.org/display/JENKINS/Test+Results+Analyzer+Plugin</url>
+  <name>THOR - Test Results History Overview</name>
+  <url>https://github.com/hblok/test-results-analyzer-plugin</url>
 
   <build>
     <plugins>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -17,6 +18,19 @@
 	  <target>1.8</target>
         </configuration>
       </plugin>
+
+      <plugin>
+	<groupId>org.codehaus.mojo</groupId>
+	<artifactId>animal-sniffer-maven-plugin</artifactId>
+	<configuration>
+	  <signature>
+            <groupId>org.codehaus.mojo.signature</groupId>
+            <artifactId>java18</artifactId>
+            <version>1.0</version>
+	  </signature>
+	</configuration>
+      </plugin>
+      
     </plugins>
   </build>
   
@@ -29,12 +43,18 @@
   </parent>
 
   <properties>
-    <jenkins.version>2.73</jenkins.version>
+    <jenkins.version>2.60</jenkins.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 	
   <developers>
+    <developer>
+      <id>hblok</id>
+      <name>hblok</name>
+      <email>github@hblok.net</email>
+    </developer>
+    
     <developer>
       <id>menonvarun</id>
       <name>Varun Menon</name>
@@ -50,18 +70,26 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:ssh://git@github.com:jenkinsci/test-results-analyzer-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/test-results-analyzer-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/test-results-analyzer-plugin.git</url>
+    <connection>scm:git:ssh://git@github.com:hblok/test-results-analyzer-plugin.git</connection>
+    <developerConnection>scm:git: git@github.com:hblok/test-results-analyzer-plugin.git</developerConnection>
+    <url>https://github.com/jenkinsci/test-results-analyzer-plugin</url>
     <tag>HEAD</tag>
   </scm>
-	
+
   <dependencies>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit</artifactId>
       <version>1.21</version>
     </dependency>
+
+    <!--
+    <dependency>
+      <groupId>org.codehaus.mojo.signature</groupId>
+      <artifactId>java18</artifactId>
+      <version>1.0</version>
+      </dependency>
+      -->
 
 	<!-- https://mvnrepository.com/artifact/org.jenkins-ci.main/jenkins-core -->
 	<!--
