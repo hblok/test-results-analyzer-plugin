@@ -1,3 +1,19 @@
+function populateTemplate(){
+    reset();
+
+    $j("#table-loading").show();
+
+    remoteAction.getTestResults(getUserConfig(),$j.proxy(function(t) {
+        console.log(t.responseObject());
+        createTable(t.responseObject());
+        $j("#table-loading").hide();
+    },this));
+}
+
+function reset() {
+    $j(".test-history-table").html("");
+}
+
 function searchTests(){
     var rows = $j(".test-history-table .table-row");
     var filter = $j("#filter").val().toLowerCase();
@@ -33,22 +49,6 @@ function applyFilter(rows, filter) {
     });
 }
 
-function reset() {
-    $j(".test-history-table").html("");
-}
-
-function populateTemplate(){
-    reset();
-    
-    $j("#table-loading").show();
-    
-    remoteAction.getTestResults(getUserConfig(),$j.proxy(function(t) {
-        console.log(t.responseObject());
-        createTable(t.responseObject());
-        $j("#table-loading").hide();
-    },this));
-}
-
 function createTable(data) {
 	var buildIds = data["builds"];
 	var results = data["results"];
@@ -56,16 +56,7 @@ function createTable(data) {
 	var table = $j(".test-history-table");
 	
 	createHeader(table, buildIds);
-
-	var packs = Object.keys(results);
-	for (var p in packs) {
-		if(!packs.hasOwnProperty(p)) continue;
-	
-		var pname = packs[p];
-		var pack = results[pname];
-		
-		createPackageRow(table, pname, pack);
-	}
+	createRows(table, results, 0);
 }
 
 function createHeader(parentDom, buildIds) {
@@ -79,31 +70,20 @@ function createHeader(parentDom, buildIds) {
 	}		
 }
 
-function createPackageRow(parentDom, packName, pack) {
-	var rowDom = createRow(parentDom, "package", 0, packName);
+var LEVELNAME = ["package", "class", "test"];
 
-	var classes = Object.keys(pack);
-	for (var c in classes) {
-		if(!classes.hasOwnProperty(c)) continue;
-	
-		var cname = classes[c];
-		var klass = pack[cname];
+function createRows(parentDom, results, level) {
+	var names = Object.keys(results);
+	for (var i = 0; i < names.length; i++) {
+		var name = names[i];
+		var subResults = results[name];
 		
-		createClassRow(parentDom, cname, klass);
-	}
-}
-	
-function createClassRow(parentDom, className, klass) {
-	var rowDom = createRow(parentDom, "class", 1, className);
-
-	var tests = Object.keys(klass);
-	for (var t in tests) {
-		if(!tests.hasOwnProperty(t)) continue;
-	
-		var tname = tests[t];
-		var results = klass[tname];
-		
-		createTestResults(parentDom, tname, results);
+		var rowDom = createRow(parentDom, LEVELNAME[level], level, name);
+		if (level < 2) {
+			createRows(parentDom, subResults, level + 1);
+		} else {
+			createTestResults(rowDom, subResults);
+		}
 	}
 }
 
@@ -114,9 +94,7 @@ var STATUSCSSMAP = {
 	"/": "na"
 };
 
-function createTestResults(parentDom, testName, results) {
-	var rowDom = createRow(parentDom, "test", 2, testName);
-
+function createTestResults(parentDom, results) {
 	for (var i = 0; i < results.length; i++) {
 		var status = results[i];
 		var cell = $j("<div>")
@@ -124,7 +102,7 @@ function createTestResults(parentDom, testName, results) {
 			.addClass("build-result")
 			.addClass(STATUSCSSMAP[status])
 			.text(status)
-			.appendTo(rowDom);
+			.appendTo(parentDom);
 	}
 }
 
