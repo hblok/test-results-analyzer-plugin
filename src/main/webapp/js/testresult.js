@@ -73,18 +73,36 @@ function createHeader(parentDom, buildIds) {
 var LEVELNAME = ["package", "class", "test"];
 
 function createRows(parentDom, results, level) {
-	var names = Object.keys(results);
+	var children = results["children"];
+	var names = Object.keys(children);
 	for (var i = 0; i < names.length; i++) {
 		var name = names[i];
-		var subResults = results[name];
+		var subResults = children[name];
 		
 		var rowDom = createRow(parentDom, LEVELNAME[level], level, name);
+		//createSpacingRow(parentDom, LEVELNAME[level], level);
+		createTestResults(rowDom, subResults["testResults"]);
 		if (level < 2) {
 			createRows(parentDom, subResults, level + 1);
-		} else {
-			createTestResults(rowDom, subResults);
 		}
+		createSpacingRow(parentDom, LEVELNAME[level], level);
 	}
+}
+
+function createSpacingRow(parentDom, rowType, level) {
+	var rowDom = $j("<div>")
+	.addClass("table-row")
+	.addClass("row-spacing-" + rowType)
+	.attr("level", level);
+
+	if (level > 0) {
+		rowDom.addClass("row-hidden");
+		rowDom.attr("custom", "hide");
+	} else {
+		rowDom.attr("custom", "show");
+	}
+
+	parentDom.append(rowDom);
 }
 
 var STATUSCSSMAP = {
@@ -109,6 +127,7 @@ function createTestResults(parentDom, results) {
 function createRow(parentDom, rowType, level, name) {
 	var rowDom = $j("<div>")
 		.addClass("table-row")
+		.addClass("table-row-" + rowType)
 		.attr("level", level);
 
 	if (level > 0) {

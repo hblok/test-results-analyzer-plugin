@@ -1,14 +1,12 @@
 package org.jenkinsci.plugins.testresultsanalyzer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 //import org.apache.log4j.Logger;
 import org.jenkinsci.plugins.testresultsanalyzer.config.UserConfig;
 import org.jenkinsci.plugins.testresultsanalyzer.result.info.JsonTestResults;
-import org.jenkinsci.plugins.testresultsanalyzer.result.info.NameExtractor;
 import org.jenkinsci.plugins.testresultsanalyzer.result.info.ResultInfo;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
@@ -133,7 +131,7 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 	}
 
 	public boolean isUpdated() {
-		Run lastBuild = project.getLastBuild();
+		Run<?, ?> lastBuild = project.getLastBuild();
 		if (lastBuild == null) {
 			return false;
 		}
@@ -178,7 +176,7 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 		}
 	}
 
-	private void addTestResult(int buildNumber, Run run, AbstractTestResultAction testAction, Object result) {
+	private void addTestResult(int buildNumber, Run<?, ?> run, AbstractTestResultAction<?> testAction, Object result) {
 		if (run == null || result == null) {
 			return;
 		}
@@ -193,36 +191,7 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 			//LOG.info("Got ClassCast exception while converting results to Tabulated Result from action: " + testAction.getClass().getName() + ". Ignoring as we only want test results for processing.");
 		}
 	}
-
-    @JavaScriptMethod
-    public JSONObject getTreeResult(UserConfig userConfig) {
-		if (resultInfo == null) {
-			return new JSONObject();
-		}
-
-        int noOfBuilds = getNoOfBuildRequired(userConfig.getNoOfBuildsNeeded());
-        List<Integer> buildList = getBuildList(noOfBuilds);
-
-        JsTreeUtil jsTreeUtils = new JsTreeUtil();
-		return jsTreeUtils.getJsTree(buildList, resultInfo, userConfig.isHideConfigMethods());
-    }
     
-	@JavaScriptMethod
-	public JSONObject getHeaders(UserConfig userConfig) {
-		if (resultInfo == null) {
-			return new JSONObject();
-		}
-
-		int noOfBuilds = getNoOfBuildRequired(userConfig.getNoOfBuildsNeeded());
-		List<Integer> buildList = getBuildList(noOfBuilds);
-
-		JSONObject result = new JSONObject();
-		result.put("builds", JSONArray.fromObject(buildList));
-		result.put("names", NameExtractor.toJson(resultInfo));
-
-		return result;
-	}
-	
 	@JavaScriptMethod
 	public JSONObject getTestResults(UserConfig userConfig) {
 		if (resultInfo == null) {

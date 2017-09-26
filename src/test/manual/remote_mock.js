@@ -3,25 +3,42 @@ var $j = jQuery.noConflict();
 var mockedResponse = {
   "builds": [6, 5, 4, 3, 2, 1],
   "results": {
-    
-    "com.example.package1": {
-      "class11": {
-        "test111": "PF/SPF",
-        "test112": "FFFFFF"
+    "children": {
+
+      "com.example.package1": {
+        "testResults": "FFFFFF",
+        "children": {
+          "class11": {
+            "testResults": "FFFFFF",
+            "children": {
+              "test111": {"testResults": "PF/SPF"},
+              "test112": {"testResults": "FFFFFF"},
+            }
+          },
+          "class12": {
+            "testResults": "PFPPPF",
+            "children": {
+              "test121": {"testResults": "PF/SPF"},
+              "test122": {"testResults": "PPPPPP"},
+            }
+          },
+        }
       },
-      "class12": {
-        "test121": "PF/SPF",
-        "test122": "PPPPPP"
+
+      "com.example.package2": {
+        "testResults": "PFPPPF",
+        "children": {
+          "class11": {
+            "testResults": "PFPPPF",
+            "children": {
+              "test111": {"testResults": "PF/SPF"},
+              "test112": {"testResults": "SSSSSS"},
+            }
+          },
+        }
       }
-    },
 
-    "com.example.package2": {
-      "class21": {
-        "test211": "PF/SPF",
-        "test212": "SSSSSS"
-      },
     }
-
   }
 };
 
