@@ -1,49 +1,36 @@
-function clearedFilter(rows) {
-    var levelsToShow = [0]; // stack to keep track of hierarchy
-
-    // Ensure that every node is expanded, that was expanded before or by the user when filtering.
-    $j(rows).each(function(index, row) {
-        var rowLevel = parseInt($j(row).attr("hierarchyLevel"));
-
-        // Remove all generations that happen after the current one, since these are not relevant anymore,
-        // when we are at a (great*)uncle.
-        while (levelsToShow[levelsToShow.length - 1] > rowLevel) {
-            levelsToShow.pop();
-        }
-
-        if ($j(row).find(".icon-minus-sign").length > 0) {
-            // also show children of this node
-            levelsToShow.push(rowLevel + 1);
-            $j(row).show();
-        } else if (levelsToShow[levelsToShow.length - 1] == rowLevel) {
-            $j(row).show();
-        } else {
-            $j(row).hide();
-        }
-    });
-}
-
-function applyFilter(rows, filter) {
-    $j(rows).each(function(index, row) {
-        var testCell = $j(row).find(".row-heading")[0];
-        var rowText = $j(testCell).text().toLowerCase();
-        if (rowText.indexOf(filter) == -1) {
-            $j(row).hide();
-        }
-        else {
-            $j(row).show();
-        }
-    });
-}
-
 function searchTests(){
     var rows = $j(".test-history-table .table-row");
     var filter = $j("#filter").val().toLowerCase();
+
     if (filter == "") {
         clearedFilter(rows);
     } else {
         applyFilter(rows, filter);
     }
+}
+
+function clearedFilter(rows) {
+	rows.filter("[custom='show']").removeClass("row-hidden");
+	rows.filter("[custom='hide']").addClass("row-hidden");
+}
+
+function applyFilter(rows, filter) {
+    $j(rows).each(function(index, row) {
+        var dom = $j(row);
+        var name = dom.find(".name")[0];
+        var nameDom = $j(name);
+		if (nameDom.hasClass("name-heading")) {
+			return;
+		}
+
+        var matchName = nameDom.text().toLowerCase();
+        if (matchName.indexOf(filter) == -1) {
+            dom.addClass("row-hidden");
+        }
+        else {
+            dom.removeClass("row-hidden");
+        }
+    });
 }
 
 function reset() {
@@ -146,8 +133,11 @@ function createRow(parentDom, rowType, level, name) {
 		.addClass("table-row")
 		.attr("level", level);
 
-	if (rowType == "class" || rowType == "test") {
+	if (level > 0) {
 		rowDom.addClass("row-hidden");
+		rowDom.attr("custom", "hide");
+	} else {
+		rowDom.attr("custom", "show");
 	}
 	
 	var nameDom = $j("<div>")
@@ -183,8 +173,10 @@ function handleExpand(src) {
 	while (next.length > 0 && nextLevel > level) {
 		if (nextLevel == level + 1 && expand) {
 			next.removeClass("row-hidden");
+			next.attr("custom", "show");
 		} else if (nextLevel > level && !expand) {
 			next.addClass("row-hidden");
+			next.attr("custom", "hide");
 			var icons = next.find(".icon");
 			icons.removeClass("icon-minus-sign");
 			icons.addClass("icon-plus-sign");
