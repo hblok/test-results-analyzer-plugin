@@ -13,8 +13,6 @@
 	font-variant: normal;
 	font-style: normal;
 	background-color: #E8F5FF;
-    #background-image: linear-gradient(#84E1F3, #E8F5FF)
-    #width: 80%
 }
 
 img {
@@ -56,7 +54,6 @@ img {
 	padding: 10px;
 	border: 1px solid rgb(150, 171, 239);
 	font-weight: bolder;
-	font-size: large;
 }
 
 .name-package {
@@ -112,13 +109,10 @@ a.build-result {
 	font-family: Patua One, sans-serif;
 	font-size: 15px;
 	display: table-row;
-	#color: rgb(255, 255, 255);
-	#text-shadow: rgba(0, 0, 0, 0.498039) 1px 1px 0px;
 	border-top-width: 1px;
 	border-top-style: solid;
 	border-top-color: rgb(133, 141, 153);
 	border-top-left-radius: 5px;
-	#background-image: linear-gradient(rgb(100, 111, 127), rgb(74, 85, 100));
 }
 
 .heading .table-cell {
@@ -139,18 +133,18 @@ button {
     margin-top: 10%;
 }
 
-.passed {
+.thor-passed {
 	background: #d4efd4;
 }
 
-.failed {
+.thor-failed {
 	background: #ffc8c2;
 }
 
-.skipped {
+.thor-skipped {
 	background: #f1ecc4;
 }
 
-.na {
+.thor-na {
 	background: #f6f7f7;
 }

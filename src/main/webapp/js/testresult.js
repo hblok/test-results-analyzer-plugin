@@ -56,7 +56,7 @@ function createTable(data) {
     var table = $j(".test-history-table");
 
     createHeader(table, buildIds);
-    createRows(table, results, 0);
+    createRows(table, buildIds, results, 0, []);
 }
 
 function createHeader(parentDom, buildIds) {
@@ -72,18 +72,19 @@ function createHeader(parentDom, buildIds) {
 
 var LEVELNAME = ["package", "class", "test"];
 
-function createRows(parentDom, results, level) {
+function createRows(parentDom, buildIds, results, level, path) {
     var children = results["children"];
     var names = Object.keys(children);
     for (var i = 0; i < names.length; i++) {
         var name = names[i];
+        path[level] = name;
         var subResults = children[name];
 
         var rowDom = createRow(parentDom, LEVELNAME[level], level, name);
         //createSpacingRow(parentDom, LEVELNAME[level], level);
-        createTestResults(rowDom, subResults["testResults"]);
+        createTestResults(rowDom, buildIds, subResults["testResults"], path.slice(0, level + 1));
         if (level < 2) {
-            createRows(parentDom, subResults, level + 1);
+            createRows(parentDom, buildIds, subResults, level + 1, path);
         }
         createSpacingRow(parentDom, LEVELNAME[level], level);
     }
@@ -106,21 +107,31 @@ function createSpacingRow(parentDom, rowType, level) {
 }
 
 var STATUSCSSMAP = {
-    "P": "passed",
-    "F": "failed",
-    "S": "skipped",
-    "/": "na"
+    "P": "thor-passed",
+    "F": "thor-failed",
+    "S": "thor-skipped",
+    "/": "thor-na"
 };
 
-function createTestResults(parentDom, results) {
+function createTestResults(parentDom, buildIds, results, path) {
     for (var i = 0; i < results.length; i++) {
+        var buildId = buildIds[i];
         var status = results[i];
         var cell = $j("<div>")
             .addClass("table-cell")
             .addClass("build-result")
             .addClass(STATUSCSSMAP[status])
-            .text(status)
             .appendTo(parentDom);
+
+        if (status == "P" || status == "F") {
+	    var link = "../" + buildId + "/testReport/" + path.join("/");
+	    var a = $j("<a>")
+	        .attr("href", link)
+	        .text(status)
+	        .appendTo(cell);
+	} else {
+	    cell.text(status);
+	}
     }
 }
 
