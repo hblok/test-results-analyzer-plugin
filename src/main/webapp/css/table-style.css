@@ -1,127 +1,127 @@
 #tree  {
-	
-	border-collapse: collapse;
+
+    border-collapse: collapse;
 }
 .table {
-	overflow: auto;
-	background: #e8edff;
-	display: table;
-	white-space: normal;
-	line-height: normal;
-	font-weight: bold;
-	font-size: medium;
-	font-variant: normal;
-	font-style: normal;
-	background-color: #E8F5FF;
+    overflow: auto;
+    background: #e8edff;
+    display: table;
+    white-space: normal;
+    line-height: normal;
+    font-weight: bold;
+    font-size: medium;
+    font-variant: normal;
+    font-style: normal;
+    background-color: #E8F5FF;
 }
 
 img {
-	margin-left: 10px;
+    margin-left: 10px;
 }
 
 .extrabuttons {
-	float: right;
+    float: right;
 }
 
 .icon {
-	background-image: url(../images/glyphicons-halflings.png);
-	width: 14px;
-	height: 14px;
-	display: inline-block;
-	margin-left: 2px;
-	margin-right: 5px;
+    background-image: url(../images/glyphicons-halflings.png);
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    margin-left: 2px;
+    margin-right: 5px;
 }
 
 .icon-plus-sign {
-	background-position: 0 -96px;
+    background-position: 0 -96px;
 }
 
 .icon-minus-sign {
-	background-position: -24px -96px;
+    background-position: -24px -96px;
 }
 
 .icon-exclamation-sign {
-	background-position: -144px -120px;
+    background-position: -144px -120px;
 }
 
 .table-cell .name {
-	display: inline-block;
+    display: inline-block;
 }
 
 .name {
-	text-align: left;
-	display: table-cell;
-	padding: 10px;
-	border: 1px solid rgb(150, 171, 239);
-	font-weight: bolder;
+    text-align: left;
+    display: table-cell;
+    padding: 10px;
+    border: 1px solid rgb(150, 171, 239);
+    font-weight: bolder;
 }
 
 .name-package {
 }
 
 .name-class {
-	padding-left: 2em;
+    padding-left: 2em;
 }
 
 .name-test {
-	padding-left: 4em;
+    padding-left: 4em;
 }
 
 
 .table-row {
-	display: table-row;
+    display: table-row;
 }
 
 .row-spacing-package {
-	height: 14px;
+    height: 14px;
 }
 
 .row-spacing-class {
-	height: 7px;
+    height: 7px;
 }
 
 .row-hidden {
-	display: none;
+    display: none;
 }
 
 .table-cell {
-	display: table-cell;
-	padding: 7px;
-	text-align: center;
-	border: 1px solid rgb(150, 171, 239);
+    display: table-cell;
+    padding: 7px;
+    text-align: center;
+    border: 1px solid rgb(150, 171, 239);
 }
 
 .build-result, .build-result a {
-	font-size: 15px;
-	text-decoration: none;
+    font-size: 15px;
+    text-decoration: none;
 }
 
 a.build-result {
   text-decoration: none;
 }
-    
+
 .heading {
     font-weight: bold;
     border-bottom: 2px solid #6678b1;
     background: #e0e6f8;
-	text-align: center;
-	box-sizing: border-box;
-	font-family: Patua One, sans-serif;
-	font-size: 15px;
-	display: table-row;
-	border-top-width: 1px;
-	border-top-style: solid;
-	border-top-color: rgb(133, 141, 153);
-	border-top-left-radius: 5px;
+    text-align: center;
+    box-sizing: border-box;
+    font-family: Patua One, sans-serif;
+    font-size: 15px;
+    display: table-row;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: rgb(133, 141, 153);
+    border-top-left-radius: 5px;
 }
 
 .heading .table-cell {
-	text-align: center;
-	font-size: 14px;
-	font-weight: bold;
-	color: #039;
-	padding-top: 10px;
-	padding-bottom: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #039;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 button {
@@ -134,17 +134,17 @@ button {
 }
 
 .thor-passed {
-	background: #d4efd4;
+    background: #d4efd4;
 }
 
 .thor-failed {
-	background: #ffc8c2;
+    background: #ffc8c2;
 }
 
 .thor-skipped {
-	background: #f1ecc4;
+    background: #f1ecc4;
 }
 
 .thor-na {
-	background: #f6f7f7;
+    background: #f6f7f7;
 }
