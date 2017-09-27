@@ -133,23 +133,23 @@ public class TestResultsAnalyzerExtension extends TransientActionFactory<Job> im
             return true;
         }
 
-		public String getNoOfBuilds() { return noOfBuilds; }
+        public String getNoOfBuilds() { return noOfBuilds; }
 
-		public boolean getShowAllBuilds() { return showAllBuilds; }
+        public boolean getShowAllBuilds() { return showAllBuilds; }
 
-		public boolean getShowLineGraph() { return showLineGraph; }
+        public boolean getShowLineGraph() { return showLineGraph; }
 
-		public boolean getShowBarGraph() { return showBarGraph; }
+        public boolean getShowBarGraph() { return showBarGraph; }
 
-		public boolean getShowPieGraph() { return showPieGraph; }
+        public boolean getShowPieGraph() { return showPieGraph; }
 
-		public boolean getHideConfigurationMethods() {
-			return hideConfigurationMethods;
-		}
+        public boolean getHideConfigurationMethods() {
+            return hideConfigurationMethods;
+        }
 
         public boolean getShowBuildTime() { return showBuildTime; }
 
-		public String getRunTimeLowThreshold() { return runTimeLowThreshold; }
+        public String getRunTimeLowThreshold() { return runTimeLowThreshold; }
 
         public String getRunTimeHighThreshold() { return runTimeHighThreshold; }
 
