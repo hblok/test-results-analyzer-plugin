@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.testresultsanalyzer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 
 //import org.apache.log4j.Logger;
 import org.jenkinsci.plugins.testresultsanalyzer.config.UserConfig;
@@ -30,6 +31,7 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 	Job project;
 	private List<Integer> builds = new ArrayList<Integer>();
 	//private final static Logger LOG = Logger.getLogger(TestResultsAnalyzerAction.class.getName());
+	private static Logger LOG = Logger.getLogger(TestResultsAnalyzerAction.class.getName());
 
 	ResultInfo resultInfo;
 
@@ -143,8 +145,11 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void getJsonLoadData() {
 		if (!isUpdated()) {
+			LOG.info("Build info is up to date");
 			return;
 		}
+
+		LOG.info("Read new build info");
 		
 		resultInfo = new ResultInfo();
 		builds = new ArrayList<Integer>();
@@ -157,6 +162,8 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 
 			int buildNumber = run.getNumber();
 			builds.add(buildNumber);
+
+			LOG.info("Reading build " + buildNumber);
 
 			List<AbstractTestResultAction> testActions = run.getActions(AbstractTestResultAction.class);
 			for (AbstractTestResultAction testAction : testActions) {
