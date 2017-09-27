@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.testresultsanalyzer.result.data;
+package github.hblok.thor.result.data;
 
 public enum ResultStatus {
 	PASSED("P"), FAILED("F"), SKIPPED("S"), NA("/");

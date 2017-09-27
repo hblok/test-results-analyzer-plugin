@@ -1,16 +1,15 @@
-package org.jenkinsci.plugins.testresultsanalyzer;
+package github.hblok.thor;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-//import org.apache.log4j.Logger;
-import org.jenkinsci.plugins.testresultsanalyzer.config.UserConfig;
-import org.jenkinsci.plugins.testresultsanalyzer.result.info.JsonTestResults;
-import org.jenkinsci.plugins.testresultsanalyzer.result.info.ResultInfo;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
+import github.hblok.thor.config.UserConfig;
+import github.hblok.thor.result.info.JsonTestResults;
+import github.hblok.thor.result.info.ResultInfo;
 import hudson.model.Action;
 import hudson.model.Actionable;
 import hudson.model.Item;

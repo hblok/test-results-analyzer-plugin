@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.testresultsanalyzer.result.info;
+package github.hblok.thor.result.info;
 
 import hudson.tasks.test.TabulatedResult;
 

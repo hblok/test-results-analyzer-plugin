@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.testresultsanalyzer;
+package github.hblok.thor;
 
 /**
  * Created by vmenon on 12/27/2015.

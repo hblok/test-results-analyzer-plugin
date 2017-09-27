@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.testresultsanalyzer;
+package github.hblok.thor;
 
 import hudson.Plugin;
 

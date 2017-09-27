@@ -1,12 +1,13 @@
-package org.jenkinsci.plugins.testresultsanalyzer.result.info;
+package github.hblok.thor.result.info;
 
 import hudson.tasks.test.TabulatedResult;
 import hudson.tasks.test.TestResult;
-import org.jenkinsci.plugins.testresultsanalyzer.result.data.PackageResultData;
-import org.jenkinsci.plugins.testresultsanalyzer.result.data.ResultData;
 
 import java.util.Map;
 import java.util.TreeMap;
+
+import github.hblok.thor.result.data.PackageResultData;
+import github.hblok.thor.result.data.ResultData;
 
 public class PackageInfo extends Info {
 

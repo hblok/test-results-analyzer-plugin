@@ -1,10 +1,10 @@
-package org.jenkinsci.plugins.testresultsanalyzer.result.info;
-
-import org.jenkinsci.plugins.testresultsanalyzer.result.data.ResultData;
+package github.hblok.thor.result.info;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+
+import github.hblok.thor.result.data.ResultData;
 
 public abstract class Info {
 

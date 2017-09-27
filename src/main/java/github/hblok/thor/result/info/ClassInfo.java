@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.testresultsanalyzer.result.info;
+package github.hblok.thor.result.info;
 
 import hudson.tasks.test.TabulatedResult;
 import hudson.tasks.test.TestResult;
@@ -6,7 +6,7 @@ import hudson.tasks.test.TestResult;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.jenkinsci.plugins.testresultsanalyzer.result.data.ClassResultData;
+import github.hblok.thor.result.data.ClassResultData;
 
 public class ClassInfo extends Info {
 

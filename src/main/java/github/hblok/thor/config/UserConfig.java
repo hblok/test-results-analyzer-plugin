@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.testresultsanalyzer.config;
+package github.hblok.thor.config;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 

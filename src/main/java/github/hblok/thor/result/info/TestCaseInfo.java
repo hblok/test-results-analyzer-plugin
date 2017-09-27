@@ -1,9 +1,10 @@
-package org.jenkinsci.plugins.testresultsanalyzer.result.info;
+package github.hblok.thor.result.info;
 
 import hudson.tasks.test.TestResult;
-import org.jenkinsci.plugins.testresultsanalyzer.result.data.TestCaseResultData;
 
 import java.util.Map;
+
+import github.hblok.thor.result.data.TestCaseResultData;
 
 public class TestCaseInfo extends Info {
 

@@ -1,12 +1,11 @@
-package org.jenkinsci.plugins.testresultsanalyzer.result.info;
+package github.hblok.thor.result.info;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.jenkinsci.plugins.testresultsanalyzer.result.data.ResultData;
-import org.jenkinsci.plugins.testresultsanalyzer.result.data.ResultStatus;
-
+import github.hblok.thor.result.data.ResultData;
+import github.hblok.thor.result.data.ResultStatus;
 import net.sf.json.JSONObject;
 
 public class JsonTestResults {
