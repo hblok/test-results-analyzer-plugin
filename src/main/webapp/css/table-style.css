@@ -20,7 +20,19 @@ img {
 }
 
 .extrabuttons {
-    float: right;
+    margin-top: 14px;
+    margin-bottom: -15px;
+}
+
+#nobuildsrange {
+    width: 12em;
+    margin-bottom: 15px;
+    vertical-align: -webkit-baseline-middle;
+}
+
+#nobuildsvalue {
+    display: inline;
+    padding-left: 13px;
 }
 
 .icon {

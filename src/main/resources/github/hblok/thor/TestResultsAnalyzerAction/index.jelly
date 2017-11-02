@@ -32,32 +32,16 @@ var $j = jQuery.noConflict();
 <j:set var="temp" value="${it.jsonLoadData}"/>
 <j:set var="builds" value="${it.builds}"/>
 
-<button id="settingsmenubutton">Options</button>
-<div id="settingsmenu" style="display: none;">
-	<table>
-		<tr>
-			<td>Number of builds:</td>
-			<td>
-				<input id="noofbuilds" type="number" value="${it.noOfBuilds}" min="1" step="1" disabled="${it.showAllBuilds}"/>
-				(all: <input id="allnoofbuilds" type="checkbox" checked="${it.showAllBuilds}" />)
-			</td>
-		</tr>
-		<tr>
-			<td>Display run time for each test:</td>
-			<td><input type="checkbox" id="show-build-durations" name="show-build-durations" checked="${it.showBuildTime}"/></td>
-		</tr>
-	</table>
-	<div>
-		<button id="getbuildreport">Update</button>
-	</div>
-</div>
+<fieldset>
+  <label>Number of builds: </label> <input id="nobuildsrange" type="range" min="1" max="15" value="3" step="1" onchange="noBuildUpdate(this)"/> <div id="nobuildsvalue">18</div> <br/>
+  <label>Search: </label> <input id="filter" class="table-filter" type="text" placeholder="Test/Class/Package" onkeyup="searchTests()"/> <br/>
+  <div class="extrabuttons">
+    <button id="expandall" onclick="expandAll()">Expand All</button>
+    <button id="expandfailed" onclick="expandFailed()">Expand Failed</button>
+	<button id="collapseall" onclick="collapseAll()">Collapse All</button>
+  </div><br/>
+</fieldset>
 
-Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Class/Package" onkeyup="searchTests()"/>
-
-<div class="extrabuttons">
-	<button id="expandall">Expand All</button>
-	<button id="collapseall">Collapse All</button>
-</div>
 <br/>
 <div id="tree">
    <div id="table-loading" style="display: none;">
@@ -73,8 +57,6 @@ Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Cl
 <br/>
 
 <script>
-	var runtimeLowThreshold = "${it.runTimeLowThreshold}";
-	var runtimeHighThreshold = "${it.runTimeHighThreshold}";
     var customStatuses = {
         'PASSED':'P',
         'SKIPPED':'S',
@@ -83,38 +65,8 @@ Search: <input id="filter" class="table-filter" type="text" placeholder="Test/Cl
     }
 
 	jQuery(document).ready(function () {
-		jQuery("#allnoofbuilds")[0].checked = ${it.showAllBuilds};
-		jQuery("#show-build-durations")[0].checked = ${it.showBuildTime};
-		jQuery("#noofbuilds").attr('disabled', ${it.showAllBuilds});
-
 		setCustomStatuses();
-		populateTemplate();
-	});
-
-	jQuery("#settingsmenubutton").click(function () {
-		jQuery("#settingsmenu").slideToggle(400, function () {
-			//fixes Jenkins issue where page content is not correctly placed until the window is resized
-			window.dispatchEvent(new Event('resize'));
-		});
-
-		//fixes Jenkins issue where page content is not correctly placed until the window is resized
-		window.dispatchEvent(new Event('resize'));
-	});
-
-	jQuery("#allnoofbuilds").change(function () {
-		jQuery("#noofbuilds").attr('disabled', this.checked);
-	});
-
-	jQuery("#getbuildreport").click(function () {
-		populateTemplate();
-	});
-	
-	jQuery("#expandall").click(function () {
-		expandAll();
-	});
-	
-	jQuery("#collapseall").click(function () {
-		collapseAll();
+		loadTestResults();
 	});
 
     function setCustomStatuses(){

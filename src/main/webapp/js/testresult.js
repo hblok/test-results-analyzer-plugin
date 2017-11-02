@@ -1,4 +1,4 @@
-function populateTemplate(){
+function loadTestResults(){
     reset();
 
     $j("#table-loading").show();
@@ -114,6 +114,8 @@ var STATUSCSSMAP = {
 };
 
 function createTestResults(parentDom, buildIds, results, path) {
+    var failed = false;
+
     for (var i = 0; i < results.length; i++) {
         var buildId = buildIds[i];
         var status = results[i];
@@ -124,14 +126,22 @@ function createTestResults(parentDom, buildIds, results, path) {
             .appendTo(parentDom);
 
         if (status == "P" || status == "F") {
-	    var link = "../" + buildId + "/testReport/" + path.join("/");
-	    var a = $j("<a>")
-	        .attr("href", link)
-	        .text(status)
-	        .appendTo(cell);
-	} else {
-	    cell.text(status);
-	}
+            var link = "../" + buildId + "/testReport/" + path.join("/");
+            var a = $j("<a>")
+                .attr("href", link)
+                .text(status)
+                .appendTo(cell);
+        } else {
+            cell.text(status);
+        }
+
+        if (status == "F") {
+            failed = true;
+        }
+    }
+
+    if (failed) {
+        parentDom.addClass("failed-row");
     }
 }
 
@@ -141,8 +151,13 @@ function createRow(parentDom, rowType, level, name) {
         .addClass("table-row-" + rowType)
         .attr("level", level);
 
+    if (level < 2) {
+        rowDom.addClass("super-level-row");
+    }
+
     if (level > 0) {
         rowDom.addClass("row-hidden");
+        rowDom.addClass("sub-level-row");
         rowDom.attr("custom", "hide");
     } else {
         rowDom.attr("custom", "show");
@@ -194,14 +209,41 @@ function handleExpand(src) {
     }
 }
 
+var ALL_BUILDS = "ALL";
+
+function noBuildUpdate(src) {
+    var val = parseInt(src.value);
+    var max = parseInt(src.max);
+    var builds = (val < max) ? Math.ceil(Math.pow(val, 2.6)) : ALL_BUILDS;
+
+    $j("#nobuildsvalue")[0].innerText = builds;
+
+    loadTestResults();
+}
+
+function expandAll() {
+    $j(".super-level-row > div > .icon").removeClass("icon-plus-sign");
+    $j(".super-level-row > div > .icon").addClass("icon-minus-sign");
+
+    $j(".sub-level-row").removeClass("row-hidden");
+}
+
+function expandFailed() {
+    $j(".failed-row").removeClass("row-hidden");
+}
+
+function collapseAll() {
+    $j(".sub-level-row").addClass("row-hidden");
+
+    $j(".super-level-row > div > .icon").removeClass("icon-minus-sign");
+    $j(".super-level-row > div > .icon").addClass("icon-plus-sign");
+}
+
 function getUserConfig(){
+    var divText = $j("#nobuildsvalue")[0].innerText;
+    var noOfBuilds = (divText == ALL_BUILDS) ? -1 : parseInt(divText);
+
     var userConfig = {};
-
-    var noOfBuilds = "-1";
-
-    if (!$j("#allnoofbuilds").is(":checked")) {
-        noOfBuilds = $j("#noofbuilds").val();
-    }
     userConfig["noOfBuildsNeeded"] = noOfBuilds;
 
     return userConfig;
