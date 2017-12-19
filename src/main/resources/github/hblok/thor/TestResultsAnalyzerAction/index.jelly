@@ -33,7 +33,7 @@ var $j = jQuery.noConflict();
 <j:set var="builds" value="${it.builds}"/>
 
 <fieldset>
-  <label>Number of builds: </label> <input id="nobuildsrange" type="range" min="1" max="15" value="3" step="1" onchange="noBuildUpdate(this)"/> <div id="nobuildsvalue">18</div> <br/>
+  <label>Number of builds: </label> <input id="nobuildsrange" type="range" min="1" max="15" value="3" step="1" oninput="onBuildSlide(this)" onchange="onBuildUpdate()"/> <div id="nobuildsvalue">18</div> <br/>
   <label>Search: </label> <input id="filter" class="table-filter" type="text" placeholder="Test/Class/Package" onkeyup="searchTests()"/> <br/>
   <div class="extrabuttons">
     <button id="expandall" onclick="expandAll()">Expand All</button>

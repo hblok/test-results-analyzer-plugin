@@ -211,13 +211,15 @@ function handleExpand(src) {
 
 var ALL_BUILDS = "ALL";
 
-function noBuildUpdate(src) {
+function onBuildSlide(src) {
     var val = parseInt(src.value);
     var max = parseInt(src.max);
     var builds = (val < max) ? Math.ceil(Math.pow(val, 2.6)) : ALL_BUILDS;
 
     $j("#nobuildsvalue")[0].innerText = builds;
+}
 
+function onBuildUpdate() {
     loadTestResults();
 }
 
