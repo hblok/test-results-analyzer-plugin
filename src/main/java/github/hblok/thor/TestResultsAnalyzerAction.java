@@ -32,7 +32,7 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
     //private final static Logger LOG = Logger.getLogger(TestResultsAnalyzerAction.class.getName());
     private static Logger LOG = Logger.getLogger(TestResultsAnalyzerAction.class.getName());
 
-    ResultInfo resultInfo;
+    ResultInfo resultInfo = new ResultInfo();
 
     public TestResultsAnalyzerAction(@SuppressWarnings("rawtypes") Job project) {
         this.project = project;
@@ -150,14 +150,15 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
 
         LOG.info("Read new build info");
 
-        resultInfo = new ResultInfo();
-        builds = new ArrayList<Integer>();
-
         RunList<Run> runs = project.getBuilds();
         for (Run run : runs) {
             if(run.isBuilding()) {
                 continue;
             }
+
+			if (builds.contains(run.getNumber())) {
+				continue;
+			}
 
             int buildNumber = run.getNumber();
             builds.add(buildNumber);

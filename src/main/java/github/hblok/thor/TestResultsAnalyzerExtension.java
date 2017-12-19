@@ -2,6 +2,9 @@ package github.hblok.thor;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -20,10 +23,17 @@ import org.kohsuke.stapler.StaplerRequest;
 @Extension
 public class TestResultsAnalyzerExtension extends TransientActionFactory<Job> implements Describable<TestResultsAnalyzerExtension> {
 
-    @Override
-    public @Nonnull Collection<? extends Action> createFor(@Nonnull Job target) {
-        return Collections.singleton(new TestResultsAnalyzerAction(target));
-    }
+	private static Logger LOG = Logger.getLogger(TestResultsAnalyzerExtension.class.getName());
+
+	private Map<Job, Action> jobActions = new HashMap<>();
+
+	@Override
+	public @Nonnull Collection<? extends Action> createFor(@Nonnull Job target) {
+		if (!jobActions.containsKey(target)) {
+			jobActions.put(target, new TestResultsAnalyzerAction(target));
+		}
+		return Collections.singleton(jobActions.get(target));
+	}
 
     @Override
     public Class<Job> type() {
