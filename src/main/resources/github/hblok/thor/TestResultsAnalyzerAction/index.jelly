@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
-<l:layout title="Test Result Graph">
+<l:layout title="THOR - Test Results History Overview">
 <st:include it="${it.project}" page="sidepanel.jelly" />
 <st:bind var="remoteAction" value="${it}"/> 
 <l:main-panel>
@@ -12,23 +12,7 @@
 
 var $j = jQuery.noConflict();
 </script>
-<style type="text/css">
-    .failed {
-        background-color: ${it.failedColor};
-    }
 
-    .passed {
-        background-color: ${it.passedColor};
-    }
-
-    .skipped{
-        background-color: ${it.skippedColor};
-    }
-
-    .no_status{
-        background-color: ${it.naColor};
-    }
-</style>
 <j:set var="temp" value="${it.jsonLoadData}"/>
 <j:set var="builds" value="${it.builds}"/>
 
@@ -57,25 +41,11 @@ var $j = jQuery.noConflict();
 <br/>
 
 <script>
-    var customStatuses = {
-        'PASSED':'P',
-        'SKIPPED':'S',
-        'FAILED':'F',
-        'N/A':'/'
-    }
-
 	jQuery(document).ready(function () {
-		setCustomStatuses();
+		var $j = jQuery.noConflict();
+		$j("#nobuildsvalue")[0].innerText = "${it.defaultBuildCount}";
 		loadTestResults();
 	});
-
-    function setCustomStatuses(){
-        customStatuses['PASSED'] = "${it.passedRepresentation}";
-        customStatuses['SKIPPED'] = "${it.skippedRepresentation}";
-        customStatuses['FAILED'] = "${it.failedRepresentation}";
-        customStatuses['N/A'] = "${it.naRepresentation}";
-    }
-
 </script>
   </l:main-panel>
   </l:layout>

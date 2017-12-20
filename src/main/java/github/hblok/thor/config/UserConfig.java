@@ -2,33 +2,28 @@ package github.hblok.thor.config;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
-/**
- * Created by vmenon on 3/17/2016.
- */
 public class UserConfig {
-    private boolean hideConfigMethods = false;
 
-    private String noOfBuildsNeeded;
+	private String buildCountRequested;
 
-    @DataBoundConstructor
-    public UserConfig(String noOfBuildsNeeded, boolean hideConfigMethods) {
-        this.noOfBuildsNeeded = noOfBuildsNeeded;
-        this.hideConfigMethods = hideConfigMethods;
-    }
+	@DataBoundConstructor
+	public UserConfig(String buildCountRequested) {
+		this.buildCountRequested = buildCountRequested;
+	}
 
-    public boolean isHideConfigMethods() {
-        return hideConfigMethods;
-    }
+	public String getBuildCountRequested() {
+		return buildCountRequested;
+	}
 
-    public void setHideConfigMethods(boolean hideConfigMethods) {
-        this.hideConfigMethods = hideConfigMethods;
-    }
+	public int getBuildCountRequestedInt() {
+		try {
+			return Integer.parseInt(buildCountRequested);
+		} catch (NumberFormatException e) {
+			return 1;
+		}
+	}
 
-    public String getNoOfBuildsNeeded() {
-        return noOfBuildsNeeded;
-    }
-
-    public void setNoOfBuildsNeeded(String noOfBuildsNeeded) {
-        this.noOfBuildsNeeded = noOfBuildsNeeded;
-    }
+	public void setBuildCountRequested(String buildCountRequested) {
+		this.buildCountRequested = buildCountRequested;
+	}
 }

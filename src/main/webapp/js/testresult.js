@@ -50,8 +50,11 @@ function applyFilter(rows, filter) {
 }
 
 function createTable(data) {
-    var buildIds = data["builds"];
+	var builds = data["builds"];
     var results = data["results"];
+    
+    var buildIds = Object.keys(builds);
+    buildIds.sort(function (a, b) {  return b - a; });
 
     var table = $j(".test-history-table");
 
@@ -242,11 +245,15 @@ function collapseAll() {
 }
 
 function getUserConfig(){
-    var divText = $j("#nobuildsvalue")[0].innerText;
-    var noOfBuilds = (divText == ALL_BUILDS) ? -1 : parseInt(divText);
+    var nobuildsvalue = $j("#nobuildsvalue")[0];
+    var noOfBuilds = 1;
+    if (nobuildsvalue) {
+		var divText = nobuildsvalue.innerText;
+		noOfBuilds = (divText == ALL_BUILDS) ? -1 : parseInt(divText);
+    }
 
     var userConfig = {};
-    userConfig["noOfBuildsNeeded"] = noOfBuilds;
+    userConfig["buildCountRequested"] = noOfBuilds;
 
     return userConfig;
 }

@@ -2,7 +2,10 @@ package github.hblok.thor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.bind.JavaScriptMethod;
@@ -21,14 +24,14 @@ import hudson.tasks.test.TabulatedResult;
 import hudson.tasks.test.TestResult;
 import hudson.util.RunList;
 import jenkins.model.Jenkins;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 
 public class TestResultsAnalyzerAction extends Actionable implements Action {
 
     @SuppressWarnings("rawtypes")
     Job project;
-    private List<Integer> builds = new ArrayList<Integer>();
+    private Map<Integer, Long> builds = new HashMap<>();
     //private final static Logger LOG = Logger.getLogger(TestResultsAnalyzerAction.class.getName());
     private static Logger LOG = Logger.getLogger(TestResultsAnalyzerAction.class.getName());
 
@@ -88,49 +91,6 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
         return this.project;
     }
 
-    @JavaScriptMethod
-    public JSONArray getNoOfBuilds(String noOfbuildsNeeded) {
-        JSONArray jsonArray;
-        int noOfBuilds = getNoOfBuildRequired(noOfbuildsNeeded);
-
-        jsonArray = getBuildsArray(getBuildList(noOfBuilds));
-
-        return jsonArray;
-    }
-
-    private JSONArray getBuildsArray(List<Integer> buildList) {
-        JSONArray jsonArray = new JSONArray();
-        for (Integer build : buildList) {
-            jsonArray.add(build);
-        }
-        return jsonArray;
-    }
-
-    private List<Integer> getBuildList(int noOfBuilds) {
-        if ((noOfBuilds <= 0) || (noOfBuilds >= builds.size())) {
-            return builds;
-        }
-
-        List<Integer> buildList = new ArrayList<Integer>();
-
-        for(int i = 0; i < noOfBuilds; i++) {
-            buildList.add(builds.get(i));
-        }
-
-        return buildList;
-    }
-
-    private int getNoOfBuildRequired(String noOfbuildsNeeded) {
-        int noOfBuilds;
-        try {
-            noOfBuilds = Integer.parseInt(noOfbuildsNeeded);
-        }
-        catch (NumberFormatException e) {
-            noOfBuilds = -1;
-        }
-        return noOfBuilds;
-    }
-
     public boolean isUpdated() {
         Run<?, ?> lastBuild = project.getLastBuild();
         if (lastBuild == null) {
@@ -138,7 +98,7 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
         }
 
         int latestBuildNumber = lastBuild.getNumber();
-        return !(builds.contains(latestBuildNumber));
+        return !(builds.containsKey(latestBuildNumber));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -156,12 +116,12 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
                 continue;
             }
 
-			if (builds.contains(run.getNumber())) {
+			if (builds.containsKey(run.getNumber())) {
 				continue;
 			}
 
             int buildNumber = run.getNumber();
-            builds.add(buildNumber);
+            builds.put(buildNumber, run.getTimeInMillis());
 
             LOG.info("Reading build " + buildNumber);
 
@@ -199,95 +159,44 @@ public class TestResultsAnalyzerAction extends Actionable implements Action {
         }
     }
 
-    @JavaScriptMethod
-    public JSONObject getTestResults(UserConfig userConfig) {
-        if (resultInfo == null) {
-            return new JSONObject();
-        }
+	private List<Integer> getReverseSortedBuildIds(UserConfig cfg) {
+		if (builds.isEmpty()) {
+			return new ArrayList<>();
+		}
 
-        int noOfBuilds = getNoOfBuildRequired(userConfig.getNoOfBuildsNeeded());
-        List<Integer> buildIds = getBuildList(noOfBuilds);
+		int requestedCount = cfg.getBuildCountRequestedInt();
 
-        JSONObject result = new JSONObject();
-        result.put("builds", JSONArray.fromObject(buildIds));
-        result.put("results", JsonTestResults.getJson(resultInfo, buildIds));
+		List<Integer> sortedIds = new ArrayList<>(builds.keySet());
+		Collections.sort(sortedIds);
+		Collections.reverse(sortedIds);
+		return sortedIds.subList(0, Math.min(sortedIds.size(), requestedCount));
+	}
 
-        return result;
+	private JSONObject getBuildInfo(List<Integer> ids) {
+		JSONObject result = new JSONObject();
+		for (int id : ids) {
+			result.put("" + id, builds.get(id));
+		}
+		return result;
+	}
+
+	@JavaScriptMethod
+	public JSONObject getTestResults(UserConfig cfg) {
+		if (resultInfo == null) {
+			return new JSONObject();
+		}
+
+		List<Integer> ids = getReverseSortedBuildIds(cfg);
+
+		JSONObject result = new JSONObject();
+		result.put("builds", getBuildInfo(ids));
+		result.put("results", JsonTestResults.getJson(resultInfo, ids));
+
+		return result;
+	}
+
+    public String getDefaultBuildCount() {
+        return TestResultsAnalyzerExtension.DESCRIPTOR.getDefaultBuildCount();
     }
 
-    public String getNoOfBuilds() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getNoOfBuilds();
-    }
-
-    public boolean getShowAllBuilds() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getShowAllBuilds();
-    }
-
-    public boolean getShowLineGraph() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getShowLineGraph();
-    }
-
-    public boolean getShowBarGraph() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getShowBarGraph();
-    }
-
-    public boolean getShowPieGraph() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getShowPieGraph();
-    }
-
-    public boolean getShowBuildTime() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getShowBuildTime();
-    }
-
-    public boolean getHideConfigurationMethods() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getHideConfigurationMethods();
-    }
-
-    public String getChartDataType() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getChartDataType();
-    }
-
-    public String getRunTimeLowThreshold() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getRunTimeLowThreshold();
-    }
-
-    public String getRunTimeHighThreshold() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getRunTimeHighThreshold();
-    }
-
-    public boolean isUseCustomStatusNames() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.isUseCustomStatusNames();
-    }
-
-    public String getPassedRepresentation() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getPassedRepresentation();
-    }
-
-    public String getFailedRepresentation() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getFailedRepresentation();
-    }
-
-    public String getSkippedRepresentation() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getSkippedRepresentation();
-    }
-
-    public String getNaRepresentation() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getNaRepresentation();
-    }
-
-    public String getPassedColor() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getPassedColor();
-    }
-
-    public String getFailedColor() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getFailedColor();
-    }
-
-    public String getSkippedColor() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getSkippedColor();
-    }
-
-    public String getNaColor() {
-        return TestResultsAnalyzerExtension.DESCRIPTOR.getNaColor();
-    }
 }
