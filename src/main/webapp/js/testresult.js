@@ -1,3 +1,18 @@
+var dateOptions = {
+	1: { day: "numeric" },
+	2: { day: "numeric", month: "numeric" },
+	3: { day: "numeric", month: "numeric", year: "2-digit" },
+	4: { day: "numeric", month: "numeric", year: "numeric" },
+	5: { weekday: "short", day: "numeric", month: "numeric", year: "numeric" },
+	6: { weekday: "short", day: "numeric", month: "short", year: "numeric" },
+	7: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
+	8: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
+	9: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
+	10: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
+};
+var keys = Object.keys(dateOptions);
+var maxDateColSpan = parseInt(keys[keys.length - 1]);
+
 function loadTestResults(){
     reset();
 
@@ -58,24 +73,86 @@ function createTable(data) {
 
     var table = $j(".test-history-table");
 
-    createHeader(table, buildIds);
-    createRows(table, buildIds, results, 0, []);
+	createBuildDateHeader(table, builds, buildIds);
+    createBuildIdHeader(table, builds, buildIds);
+    createRows(table, builds, buildIds, results, 0, []);
 }
 
-function createHeader(parentDom, buildIds) {
-    var rowDom = createRow(parentDom, "heading", -1, "Package / Class / Test");
+function getLocalBuildDate(date, sameDayCount) {
+	var count = Math.min(maxDateColSpan, sameDayCount);
+	return date.toLocaleDateString("en-GB", dateOptions[count]);
+}
 
-    for(var i = 0; i < buildIds.length; i++) {
+function getLocalBuildTime(time) {
+	var options = { hour: "2-digit", minute: "2-digit", weekday: "long", day: "numeric", month: "long", year: "numeric" };
+	return time.toLocaleDateString("en-GB", options);
+}
+
+function createBuildDateHeader(parentDom, builds, sortedIds) {
+    var rowDom = createRow(parentDom, "heading", -1, "Build date");
+    
+	var dateGroups = [];
+	
+	for(var i = sortedIds.length - 1; i >= 0; i--) {
+		var date = new Date(builds[sortedIds[i]]);
+		var day = date.toLocaleDateString();
+		
+		var sameDayCount = 1;
+		for(var j = i - 1; j >= 0; j--) {
+			var nextDate = new Date(builds[sortedIds[j]]);
+			var nextDay = nextDate.toLocaleDateString();
+			
+			if (day == nextDay) {
+				dateGroups[i] = -sameDayCount;
+				sameDayCount++;
+				i--;
+			} else {
+				dateGroups[i] = getLocalBuildDate(date, sameDayCount);
+				break;
+			}
+		}
+		
+		if (i == 0 && typeof dateGroups[i] === 'undefined') {
+			dateGroups[0] = getLocalBuildDate(date, sameDayCount);
+		}
+	}
+    
+    for(var i = 0; i < sortedIds.length; i++) {
+    	var date = new Date(builds[sortedIds[i]]);
+    
         var cell = $j("<div>")
             .addClass("table-cell")
-            .text(buildIds[i])
+            .appendTo(rowDom);
+            
+        if (dateGroups[i] == -1) {
+			cell.addClass("date_hide_left");
+		} else if (dateGroups[i] < -1) {
+			cell.addClass("date_hide_both");
+		} else {
+			cell.text(dateGroups[i]);
+			cell.addClass("date_show");
+			cell.attr("title", getLocalBuildDate(date, maxDateColSpan));
+		}
+    }
+}
+
+function createBuildIdHeader(parentDom, builds, sortedIds) {
+    var rowDom = createRow(parentDom, "heading", -1, "Package | Class | Test  /  Build Id");
+
+    for(var i = 0; i < sortedIds.length; i++) {
+    	var time = new Date(builds[sortedIds[i]]);
+    
+        var cell = $j("<div>")
+            .addClass("table-cell")
+            .text(sortedIds[i])
+            .attr("title", getLocalBuildTime(time))
             .appendTo(rowDom);
     }
 }
 
 var LEVELNAME = ["package", "class", "test"];
 
-function createRows(parentDom, buildIds, results, level, path) {
+function createRows(parentDom, builds, buildIds, results, level, path) {
     var children = results["children"];
     var names = Object.keys(children);
     for (var i = 0; i < names.length; i++) {
@@ -85,9 +162,9 @@ function createRows(parentDom, buildIds, results, level, path) {
 
         var rowDom = createRow(parentDom, LEVELNAME[level], level, name);
         //createSpacingRow(parentDom, LEVELNAME[level], level);
-        createTestResults(rowDom, buildIds, subResults["testResults"], path.slice(0, level + 1));
+        createTestResults(rowDom, builds, buildIds, subResults["testResults"], path.slice(0, level + 1));
         if (level < 2) {
-            createRows(parentDom, buildIds, subResults, level + 1, path);
+            createRows(parentDom, builds, buildIds, subResults, level + 1, path);
         }
         createSpacingRow(parentDom, LEVELNAME[level], level);
     }
@@ -116,11 +193,12 @@ var STATUSCSSMAP = {
     "/": "thor-na"
 };
 
-function createTestResults(parentDom, buildIds, results, path) {
+function createTestResults(parentDom, builds, buildIds, results, path) {
     var failed = false;
 
     for (var i = 0; i < results.length; i++) {
         var buildId = buildIds[i];
+        var time = new Date(builds[buildIds[i]]);
         var status = results[i];
         var cell = $j("<div>")
             .addClass("table-cell")
@@ -130,9 +208,11 @@ function createTestResults(parentDom, buildIds, results, path) {
 
         if (status == "P" || status == "F") {
             var link = "../" + buildId + "/testReport/" + path.join("/");
+            var title = "Build: " + buildId + "\n" +path.join("/") + "\n" + getLocalBuildTime(time)
             var a = $j("<a>")
                 .attr("href", link)
                 .text(status)
+                .attr("title", title)
                 .appendTo(cell);
         } else {
             cell.text(status);

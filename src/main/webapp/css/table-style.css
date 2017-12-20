@@ -136,6 +136,21 @@ a.build-result {
     padding-bottom: 10px;
 }
 
+.date_show {
+	border-right: 0px;
+	white-space: nowrap;
+	max-width: 0px;
+}
+
+.date_hide_left {
+	border-left: 0px;
+}
+
+.date_hide_both {
+	border-left: 0px;
+	border-right: 0px;
+}
+
 button {
     margin: 3px;
 }
