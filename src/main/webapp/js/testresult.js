@@ -62,20 +62,34 @@ function applyFilter(rows, filter) {
             dom.removeClass("row-hidden");
         }
     });
+
+    postCreateTestResults();
 }
 
+var builds;
+var results;
+var sortedIds;
+var storedResults = {};
+
 function createTable(data) {
-	var builds = data["builds"];
-    var results = data["results"];
+	builds = data["builds"];
+    results = data["results"];
+    storedResults = {};
     
-    var buildIds = Object.keys(builds);
-    buildIds.sort(function (a, b) {  return b - a; });
+    sortedIds = Object.keys(builds);
+    sortedIds.sort(function (a, b) {  return b - a; });
 
     var table = $j(".test-history-table");
 
-	createBuildDateHeader(table, builds, buildIds);
-    createBuildIdHeader(table, builds, buildIds);
-    createRows(table, builds, buildIds, results, 0, []);
+	var start = new Date().getTime();
+
+	createBuildDateHeader(table);
+    createBuildIdHeader(table);
+    createRows(table, results, 0, []);
+
+    var now = new Date().getTime();
+    console.log("createTable="+(now-start));
+
 }
 
 function getLocalBuildDate(date, sameDayCount) {
@@ -88,8 +102,8 @@ function getLocalBuildTime(time) {
 	return time.toLocaleDateString("en-GB", options);
 }
 
-function createBuildDateHeader(parentDom, builds, sortedIds) {
-    var rowDom = createRow(parentDom, "heading", -1, "Build date");
+function createBuildDateHeader(parentDom) {
+    var rowDom = createRow(parentDom, "heading", -1, "Build date", []);
     
 	var dateGroups = [];
 	
@@ -136,8 +150,8 @@ function createBuildDateHeader(parentDom, builds, sortedIds) {
     }
 }
 
-function createBuildIdHeader(parentDom, builds, sortedIds) {
-    var rowDom = createRow(parentDom, "heading", -1, "Package | Class | Test  /  Build Id");
+function createBuildIdHeader(parentDom) {
+    var rowDom = createRow(parentDom, "heading", -1, "Package | Class | Test  /  Build Id", []);
 
     for(var i = 0; i < sortedIds.length; i++) {
     	var time = new Date(builds[sortedIds[i]]);
@@ -152,7 +166,7 @@ function createBuildIdHeader(parentDom, builds, sortedIds) {
 
 var LEVELNAME = ["package", "class", "test"];
 
-function createRows(parentDom, builds, buildIds, results, level, path) {
+function createRows(parentDom, results, level, path) {
     var children = results["children"];
     var names = Object.keys(children);
     for (var i = 0; i < names.length; i++) {
@@ -160,11 +174,15 @@ function createRows(parentDom, builds, buildIds, results, level, path) {
         path[level] = name;
         var subResults = children[name];
 
-        var rowDom = createRow(parentDom, LEVELNAME[level], level, name);
-        //createSpacingRow(parentDom, LEVELNAME[level], level);
-        createTestResults(rowDom, builds, buildIds, subResults["testResults"], path.slice(0, level + 1));
+        var rowDom = createRow(parentDom, LEVELNAME[level], level, name, path.slice(0, level + 1));
+        if(level == 0) {
+        	createTestResults(rowDom, subResults["testResults"]);
+        } else {
+        	storeResults(rowDom, subResults["testResults"]);
+        }
+
         if (level < 2) {
-            createRows(parentDom, builds, buildIds, subResults, level + 1, path);
+            createRows(parentDom, subResults, level + 1, path);
         }
         createSpacingRow(parentDom, LEVELNAME[level], level);
     }
@@ -193,12 +211,14 @@ var STATUSCSSMAP = {
     "/": "thor-na"
 };
 
-function createTestResults(parentDom, builds, buildIds, results, path) {
+function createTestResults(parentDom, results) {
+	var path = parentDom.attr("path");
+
     var failed = false;
 
     for (var i = 0; i < results.length; i++) {
-        var buildId = buildIds[i];
-        var time = new Date(builds[buildIds[i]]);
+        var buildId = sortedIds[i];
+        var time = new Date(builds[sortedIds[i]]);
         var status = results[i];
         var cell = $j("<div>")
             .addClass("table-cell")
@@ -207,8 +227,8 @@ function createTestResults(parentDom, builds, buildIds, results, path) {
             .appendTo(parentDom);
 
         if (status == "P" || status == "F") {
-            var link = "../" + buildId + "/testReport/" + path.join("/");
-            var title = "Build: " + buildId + "\n" +path.join("/") + "\n" + getLocalBuildTime(time)
+            var link = "../" + buildId + "/testReport/" + path;
+            var title = "Build: " + buildId + "\n" +path + "\n" + getLocalBuildTime(time)
             var a = $j("<a>")
                 .attr("href", link)
                 .text(status)
@@ -228,11 +248,28 @@ function createTestResults(parentDom, builds, buildIds, results, path) {
     }
 }
 
-function createRow(parentDom, rowType, level, name) {
+function storeResults(parentDom, results) {
+	var id = parentDom.attr("path");
+	parentDom.addClass("stored-results")
+	storedResults[id] = results;
+}
+
+function postCreateTestResults() {
+	var emptyRows = $j(".stored-results").not(".row-hidden");
+	for (var i=0; i < emptyRows.length; i++) {
+		var parentDom = $j(emptyRows[i]);
+		var id = parentDom.attr("path");
+		createTestResults(parentDom, storedResults[id]);
+		parentDom.removeClass("stored-results");
+	}
+}
+
+function createRow(parentDom, rowType, level, name, path) {
     var rowDom = $j("<div>")
         .addClass("table-row")
         .addClass("table-row-" + rowType)
-        .attr("level", level);
+        .attr("level", level)
+		.attr("path", path.join("/"));
 
     if (level < 2) {
         rowDom.addClass("super-level-row");
@@ -290,6 +327,8 @@ function handleExpand(src) {
         next = next.next();
         nextLevel = parseInt(next.attr("level"));
     }
+
+    postCreateTestResults();
 }
 
 var ALL_BUILDS = "ALL";
@@ -311,10 +350,14 @@ function expandAll() {
     $j(".super-level-row > div > .icon").addClass("icon-minus-sign");
 
     $j(".sub-level-row").removeClass("row-hidden");
+
+    postCreateTestResults();
 }
 
 function expandFailed() {
     $j(".failed-row").removeClass("row-hidden");
+
+    postCreateTestResults();
 }
 
 function collapseAll() {
