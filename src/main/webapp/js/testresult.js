@@ -1,32 +1,48 @@
 var dateOptions = {
-	1: { day: "numeric" },
-	2: { day: "numeric", month: "numeric" },
-	3: { day: "numeric", month: "numeric", year: "2-digit" },
-	4: { day: "numeric", month: "numeric", year: "numeric" },
-	5: { weekday: "short", day: "numeric", month: "numeric", year: "numeric" },
-	6: { weekday: "short", day: "numeric", month: "short", year: "numeric" },
-	7: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
-	8: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
-	9: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
-	10: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
+    1: { day: "numeric" },
+    2: { day: "numeric", month: "numeric" },
+    3: { day: "numeric", month: "numeric", year: "2-digit" },
+    4: { day: "numeric", month: "numeric", year: "numeric" },
+    5: { weekday: "short", day: "numeric", month: "numeric", year: "numeric" },
+    6: { weekday: "short", day: "numeric", month: "short", year: "numeric" },
+    7: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
+    8: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
+    9: { weekday: "short", day: "numeric", month: "long", year: "numeric" },
+    10: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
 };
 var keys = Object.keys(dateOptions);
 var maxDateColSpan = parseInt(keys[keys.length - 1]);
 
-function loadTestResults(){
-    reset();
+function showLoading() {
+    $j(".loading").show();
+}
 
-    $j("#table-loading").show();
+function hideLoading() {
+    $j(".loading").hide();
+    $j(".rendering").hide();
+}
 
-    remoteAction.getTestResults(getUserConfig(),$j.proxy(function(t) {
-        console.log(t.responseObject());
-        createTable(t.responseObject());
-        $j("#table-loading").hide();
-    },this));
+function showRendering() {
+    $j(".rendering").show();
+}
+
+function hideRendering() {
+    $j(".rendering").hide();
 }
 
 function reset() {
     $j(".test-history-table").html("");
+}
+
+function loadTestResults(){
+    reset();
+    showLoading();
+
+    remoteAction.getTestResults(getUserConfig(),$j.proxy(function(t) {
+        console.log(t.responseObject());
+        createTable(t.responseObject());
+        hideLoading();
+    },this));
 }
 
 function searchTests(){
@@ -72,7 +88,7 @@ var sortedIds;
 var storedResults = {};
 
 function createTable(data) {
-	builds = data["builds"];
+    builds = data["builds"];
     results = data["results"];
     storedResults = {};
     
@@ -81,72 +97,66 @@ function createTable(data) {
 
     var table = $j(".test-history-table");
 
-	var start = new Date().getTime();
-
-	createBuildDateHeader(table);
+    createBuildDateHeader(table);
     createBuildIdHeader(table);
     createRows(table, results, 0, []);
-
-    var now = new Date().getTime();
-    console.log("createTable="+(now-start));
-
 }
 
 function getLocalBuildDate(date, sameDayCount) {
-	var count = Math.min(maxDateColSpan, sameDayCount);
-	return date.toLocaleDateString("en-GB", dateOptions[count]);
+    var count = Math.min(maxDateColSpan, sameDayCount);
+    return date.toLocaleDateString("en-GB", dateOptions[count]);
 }
 
 function getLocalBuildTime(time) {
-	var options = { hour: "2-digit", minute: "2-digit", weekday: "long", day: "numeric", month: "long", year: "numeric" };
-	return time.toLocaleDateString("en-GB", options);
+    var options = { hour: "2-digit", minute: "2-digit", weekday: "long", day: "numeric", month: "long", year: "numeric" };
+    return time.toLocaleDateString("en-GB", options);
 }
 
 function createBuildDateHeader(parentDom) {
     var rowDom = createRow(parentDom, "heading", -1, "Build date", []);
     
-	var dateGroups = [];
-	
-	for(var i = sortedIds.length - 1; i >= 0; i--) {
-		var date = new Date(builds[sortedIds[i]]);
-		var day = date.toLocaleDateString();
-		
-		var sameDayCount = 1;
-		for(var j = i - 1; j >= 0; j--) {
-			var nextDate = new Date(builds[sortedIds[j]]);
-			var nextDay = nextDate.toLocaleDateString();
-			
-			if (day == nextDay) {
-				dateGroups[i] = -sameDayCount;
-				sameDayCount++;
-				i--;
-			} else {
-				dateGroups[i] = getLocalBuildDate(date, sameDayCount);
-				break;
-			}
-		}
-		
-		if (i == 0 && typeof dateGroups[i] === 'undefined') {
-			dateGroups[0] = getLocalBuildDate(date, sameDayCount);
-		}
-	}
+    var dateGroups = [];
+    
+    for(var i = sortedIds.length - 1; i >= 0; i--) {
+        var date = new Date(builds[sortedIds[i]]);
+        var day = date.toLocaleDateString();
+        
+        var sameDayCount = 1;
+        for(var j = i - 1; j >= 0; j--) {
+            var nextDate = new Date(builds[sortedIds[j]]);
+            var nextDay = nextDate.toLocaleDateString();
+            
+            if (day == nextDay) {
+                dateGroups[i] = -sameDayCount;
+                sameDayCount++;
+                i--;
+            } else {
+                dateGroups[i] = getLocalBuildDate(date, sameDayCount);
+                break;
+            }
+        }
+        
+        if (i == 0 && typeof dateGroups[i] === 'undefined') {
+            dateGroups[0] = getLocalBuildDate(date, sameDayCount);
+        }
+    }
     
     for(var i = 0; i < sortedIds.length; i++) {
-    	var date = new Date(builds[sortedIds[i]]);
+        var date = new Date(builds[sortedIds[i]]);
     
         var cell = $j("<div>")
             .addClass("table-cell")
             .appendTo(rowDom);
             
         if (dateGroups[i] == -1) {
-			cell.addClass("date_hide_left");
-		} else if (dateGroups[i] < -1) {
-			cell.addClass("date_hide_both");
-		} else {
-			cell.text(dateGroups[i]);
-			cell.addClass("date_show");
-			cell.attr("title", getLocalBuildDate(date, maxDateColSpan));
-		}
+            cell.addClass("date_hide_left");
+        } else if (dateGroups[i] < -1) {
+            cell.addClass("date_hide_both");
+        } else {
+            cell.text(dateGroups[i]);
+            cell.addClass("date_show");
+            cell.attr("title", getLocalBuildDate(date, maxDateColSpan));
+        }
     }
 }
 
@@ -154,7 +164,7 @@ function createBuildIdHeader(parentDom) {
     var rowDom = createRow(parentDom, "heading", -1, "Package | Class | Test  /  Build Id", []);
 
     for(var i = 0; i < sortedIds.length; i++) {
-    	var time = new Date(builds[sortedIds[i]]);
+        var time = new Date(builds[sortedIds[i]]);
     
         var cell = $j("<div>")
             .addClass("table-cell")
@@ -169,16 +179,26 @@ var LEVELNAME = ["package", "class", "test"];
 function createRows(parentDom, results, level, path) {
     var children = results["children"];
     var names = Object.keys(children);
-    for (var i = 0; i < names.length; i++) {
+    var names_len = names.length;
+    for (var i = 0; i < names_len; i++) {
         var name = names[i];
         path[level] = name;
         var subResults = children[name];
 
         var rowDom = createRow(parentDom, LEVELNAME[level], level, name, path.slice(0, level + 1));
+        
+        if ("testResults" in subResults) {
+            var testResults = subResults["testResults"];
+            var failed = testResults.indexOf("F") != -1;
+            if (failed) {
+                rowDom.addClass("failed-row");
+            }
+        }        
+        
         if(level == 0) {
-        	createTestResults(rowDom, subResults["testResults"]);
+            createTestResults(rowDom, subResults["testResults"]);
         } else {
-        	storeResults(rowDom, subResults["testResults"]);
+            storeResults(rowDom, subResults["testResults"]);
         }
 
         if (level < 2) {
@@ -196,6 +216,7 @@ function createSpacingRow(parentDom, rowType, level) {
 
     if (level > 0) {
         rowDom.addClass("row-hidden");
+        rowDom.addClass("sub-level-row");
         rowDom.attr("custom", "hide");
     } else {
         rowDom.attr("custom", "show");
@@ -212,7 +233,7 @@ var STATUSCSSMAP = {
 };
 
 function createTestResults(parentDom, results) {
-	var path = parentDom.attr("path");
+    var path = parentDom.attr("path");
 
     var failed = false;
 
@@ -243,25 +264,38 @@ function createTestResults(parentDom, results) {
         }
     }
 
-    if (failed) {
-        parentDom.addClass("failed-row");
-    }
+    parentDom.removeClass("stored-results");
 }
 
 function storeResults(parentDom, results) {
-	var id = parentDom.attr("path");
-	parentDom.addClass("stored-results")
-	storedResults[id] = results;
+    var id = parentDom.attr("path");
+    parentDom.addClass("stored-results")
+    storedResults[id] = results;
 }
 
 function postCreateTestResults() {
-	var emptyRows = $j(".stored-results").not(".row-hidden");
-	for (var i=0; i < emptyRows.length; i++) {
-		var parentDom = $j(emptyRows[i]);
-		var id = parentDom.attr("path");
-		createTestResults(parentDom, storedResults[id]);
-		parentDom.removeClass("stored-results");
-	}
+    var emptyRows = $j(".stored-results").not(".row-hidden");
+    var row_len = emptyRows.length;
+
+    if (row_len > 0) {
+        setTimeout(showRendering, 1);
+    }
+
+    for (var i=0; i < row_len; i++) {
+        var parentDom = $j(emptyRows[i]);
+        var id = parentDom.attr("path");
+        
+        setTimeout(
+            function(parentDom, results, last) {
+                createTestResults(parentDom, results);
+
+                if (last) {
+                    window.setTimeout(hideRendering, 10);
+                }
+            },
+            10,
+            parentDom, storedResults[id], i == row_len -1);
+    }
 }
 
 function createRow(parentDom, rowType, level, name, path) {
@@ -269,7 +303,7 @@ function createRow(parentDom, rowType, level, name, path) {
         .addClass("table-row")
         .addClass("table-row-" + rowType)
         .attr("level", level)
-		.attr("path", path.join("/"));
+        .attr("path", path.join("/"));
 
     if (level < 2) {
         rowDom.addClass("super-level-row");
@@ -371,8 +405,8 @@ function getUserConfig(){
     var nobuildsvalue = $j("#nobuildsvalue")[0];
     var noOfBuilds = 1;
     if (nobuildsvalue) {
-		var divText = nobuildsvalue.innerText;
-		noOfBuilds = (divText == ALL_BUILDS) ? -1 : parseInt(divText);
+        var divText = nobuildsvalue.innerText;
+        noOfBuilds = (divText == ALL_BUILDS) ? -1 : parseInt(divText);
     }
 
     var userConfig = {};

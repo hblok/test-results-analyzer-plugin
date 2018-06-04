@@ -23,12 +23,18 @@ var $j = jQuery.noConflict();
     <button id="expandall" onclick="expandAll()">Expand All</button>
     <button id="expandfailed" onclick="expandFailed()">Expand Failed</button>
 	<button id="collapseall" onclick="collapseAll()">Collapse All</button>
-  </div><br/>
+  </div>
+  
+  <div class="progress-border rendering">
+	  <div id="rendering">Rendering...</div>
+  </div>
+   
+   <br/>
 </fieldset>
 
 <br/>
 <div id="tree">
-   <div id="table-loading" style="display: none;">
+   <div id="table-loading" class="loading" style="display: none;">
        <img src="${resURL}/plugin/thor-test-results-history-overview/images/loading2.gif"/>
    </div>
 
